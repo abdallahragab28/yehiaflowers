@@ -1,0 +1,9 @@
+{
+  "name": "yehiaflowers",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Wholesale cut-flower ordering site with admin panel (Supabase + plain JavaScript, no build step)",
+  "scripts": {
+    "dev": "npx serve . -l 3000"
+  }
+}

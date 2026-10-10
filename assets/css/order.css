@@ -1,0 +1,56 @@
+/* Public order page: a clean, printable receipt with photos. */
+.o-top { background: var(--top); color: #fff; padding-top: var(--safe-t); }
+.o-top-in { max-width: 760px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; min-height: 60px; }
+.o-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.125rem; }
+.brand-mark { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: rgba(255, 255, 255, 0.14); }
+.o-top-actions { display: flex; align-items: center; gap: 4px; }
+.o-main { max-width: 760px; margin: 0 auto; padding: 16px 16px calc(40px + var(--safe-b)); }
+.h2 { font-size: 1.25rem; }
+
+.o-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); padding: 20px; display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.3s ease; }
+.o-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.o-head h1 { font-size: 1.75rem; }
+.o-ref { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); text-transform: uppercase; }
+html[lang="ar"] .o-ref { letter-spacing: 0; text-transform: none; }
+
+
+.track { display: flex; align-items: flex-start; }
+.track li { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-size: 0.8125rem; color: var(--muted); }
+.track li::before { content: ""; position: absolute; top: 13px; inset-inline-start: calc(-50% + 16px); inset-inline-end: calc(50% + 16px); height: 2px; background: var(--line-strong); }
+.track li:first-child::before { display: none; }
+.track .dot { position: relative; z-index: 1; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--line-strong); background: var(--surface); font-size: 0.75rem; font-weight: 700; }
+.track li.done .dot { background: var(--btn); border-color: var(--btn); color: var(--btn-ink); }
+.track li.done::before, .track li.now::before { background: var(--btn); }
+.track li.now .dot { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+.track li.now, .track li.done { color: var(--ink); font-weight: 600; }
+.o-cancel { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: var(--r-sm); background: var(--surface-2); font-weight: 600; }
+
+.o-meta { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 14px; border-radius: var(--r-sm); background: var(--surface-2); }
+.o-meta dt { font-size: 0.75rem; color: var(--muted); }
+.o-meta dd { font-weight: 700; }
+
+.o-items { display: grid; gap: 12px; }
+.o-item { display: flex; gap: 14px; padding: 12px; border: 1px solid var(--line); border-radius: var(--r); }
+.o-img { flex: none; width: 96px; height: 96px; padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: var(--surface-2); cursor: zoom-in; }
+.o-img img { width: 100%; height: 100%; object-fit: cover; }
+.o-img.ph { display: grid; place-items: center; cursor: default; color: color-mix(in srgb, var(--c) 70%, var(--ink)); background: color-mix(in srgb, var(--c) 20%, var(--surface-2)); }
+.o-info { display: flex; flex-direction: column; gap: 4px; justify-content: center; min-width: 0; }
+.o-info h3 { font-size: 1.0625rem; }
+.o-col { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-weight: 500; }
+.o-qty { display: flex; flex-direction: column; margin-top: 2px; }
+.o-qty span { color: var(--muted); font-size: 0.8125rem; }
+.o-note { padding: 12px 14px; border-radius: var(--r-sm); background: var(--accent-soft); font-size: 0.9375rem; }
+
+.o-total h2 { font-size: 0.9375rem; margin-bottom: 10px; color: var(--muted); font-weight: 600; }
+.o-total dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
+.o-total dl div { padding: 14px 6px; border-radius: var(--r-sm); background: var(--btn); color: var(--btn-ink); }
+.o-total dt { font-size: 0.75rem; opacity: 0.85; }
+.o-total dd { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.o-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+@media print {
+  .o-top, .o-actions { display: none !important; }
+  body { background: #fff; color: #000; }
+  .o-card { box-shadow: none; border: 0; padding: 0; }
+  .o-item { break-inside: avoid; }
+}

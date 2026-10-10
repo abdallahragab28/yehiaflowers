@@ -1,0 +1,6 @@
+{
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/o/:token", "destination": "/order/index.html" }
+  ]
+}
