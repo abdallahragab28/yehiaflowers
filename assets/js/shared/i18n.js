@@ -13,7 +13,7 @@ export const makeT = (dict) => (key, vars) => {
 // Unit words: [english singular, english plural] and [arabic one, two, few (3-10), many (11+)].
 const UNITS = {
   pack: [["pack", "packs"], ["عبوة", "عبوتان", "عبوات", "عبوة"]],
-  stem: [["stem", "stems"], ["عود", "عودان", "أعواد", "عود"]],
+  stem: [["stem", "stems"], ["حبة", "حبتان", "حبات", "حبة"]],
   bunch: [["bunch", "bunches"], ["حزمة", "حزمتان", "حزم", "حزمة"]],
   color: [["color", "colors"], ["لون", "لونان", "ألوان", "لون"]],
   type: [["variety", "varieties"], ["صنف", "صنفان", "أصناف", "صنف"]],

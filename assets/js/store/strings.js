@@ -26,7 +26,7 @@ export const t = makeT({
   w_f1: ["Direct from the farm", "مباشرة من المزرعة"],
   w_f1d: ["Cut and packed fresh for your order.", "قطف وتعبئة طازجة لطلبك."],
   w_f2: ["Order by the pack", "اطلب بالعبوة"],
-  w_f2d: ["A fixed number of stems per pack, shown on every flower.", "عدد ثابت من الأعواد في كل عبوة، يظهر على كل زهرة."],
+  w_f2d: ["A fixed number of stems per pack, shown on every flower.", "عدد ثابت من الحبات في كل عبوة، يظهر على كل زهرة."],
   w_f3: ["Price on WhatsApp", "السعر على واتساب"],
   w_f3d: ["No online payment. We reply with a quote.", "لا دفع عبر الإنترنت. نرد عليك بعرض السعر."],
 
@@ -70,7 +70,7 @@ export const t = makeT({
   spec: ["Pack size", "حجم العبوة"],
   of: ["of", "من"],
   packs: ["Packs", "العبوات"],
-  stems: ["Stems", "الأعواد"],
+  stems: ["Stems", "الحبات"],
   bunches: ["Bunches", "الحزم"],
   addPack: ["Add one pack of {name}", "أضف عبوة من {name}"],
   removePack: ["Remove one pack of {name}", "احذف عبوة من {name}"],

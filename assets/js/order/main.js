@@ -11,7 +11,7 @@ const t = makeT({
   for: ["Prepared for", "باسم"],
   items: ["Items", "الأصناف"],
   packs: ["Packs", "العبوات"],
-  stems: ["Stems", "الأعواد"],
+  stems: ["Stems", "الحبات"],
   bunches: ["Bunches", "الحزم"],
   total: ["Order total", "إجمالي الطلب"],
   note: ["Customer note", "ملاحظة العميل"],
