@@ -188,6 +188,8 @@ function translateStatic() {
   if (footWa) footWa.innerHTML = `${icon("chat", 16)} <span>${t("footWa")}</span>`;
   const footIg = $("#footIg");
   if (footIg) footIg.innerHTML = `${icon("instagram", 16)} <span>${t("footIg")}</span>`;
+  const backTopIc = $("#backTopIc");
+  if (backTopIc) backTopIc.innerHTML = icon("arrowUp", 20);
 }
 
 function chrome(name) {
@@ -200,6 +202,7 @@ function chrome(name) {
   const bar = $("#cartbar");
   const show = tt.packs > 0 && ["shop", "category", "flower"].includes(name);
   bar.hidden = !show;
+  document.body.classList.toggle("has-cartbar", show);
   if (show) {
     bar.innerHTML = `<span class="cb-l">${icon("cart", 20)}<b>${esc(unit(tt.packs, "pack"))}</b><span class="cb-s">${esc(unit(tt.stems, "stem"))}</span></span>
       <span class="cb-r">${t("review")} ${icon("arrowRight", 18, "flip")}</span>`;
@@ -316,6 +319,9 @@ const ACT = {
     if (S.q) setQuery("");
     else if (location.hash === "#/shop" || !location.hash) { window.scrollTo({ top: 0, behavior: "smooth" }); }
   },
+  top() {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  },
   inc(el) { const id = el.dataset.c; setQty(id, qty(id) + 1); pop = id; render(); },
   dec(el) { const id = el.dataset.c; setQty(id, qty(id) - 1); pop = id; render(); },
   del(el) {
@@ -414,13 +420,23 @@ const onQuery = debounce(() => {
 qInput.addEventListener("input", onQuery);
 $("#searchForm").addEventListener("submit", (e) => { e.preventDefault(); qInput.blur(); });
 
-// Header gets a soft shadow once the page scrolls. (Only a class changes, so nothing jumps.)
+// Header gets a soft shadow once the page scrolls, and back-to-top floating button appears.
+const backTopBtn = $("#backTop");
 let ticking = false;
 window.addEventListener("scroll", () => {
   if (ticking) return;
   ticking = true;
   requestAnimationFrame(() => {
-    $("#top").classList.toggle("scrolled", window.scrollY > 6);
+    const sy = window.scrollY;
+    $("#top").classList.toggle("scrolled", sy > 6);
+    if (backTopBtn) {
+      const show = sy > 380;
+      const was = backTopBtn.classList.contains("show");
+      if (show !== was) {
+        backTopBtn.classList.toggle("show", show);
+        backTopBtn.tabIndex = show ? 0 : -1;
+      }
+    }
     ticking = false;
   });
 }, { passive: true });

@@ -10,6 +10,7 @@ export const t = makeT({
   search: ["Search flowers or colors", "ابحث عن زهرة أو لون"],
   clear: ["Clear search", "مسح البحث"],
   back: ["Back", "رجوع"],
+  backToTop: ["Back to top", "العودة إلى الأعلى"],
   close: ["Close", "إغلاق"],
   prev: ["Previous photo", "الصورة السابقة"],
   next: ["Next photo", "الصورة التالية"],
