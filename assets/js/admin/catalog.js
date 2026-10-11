@@ -12,7 +12,7 @@ import { toast, openDialog, confirmDialog } from "../shared/ui.js";
 export const PRESETS = {
   red: ["Red", "أحمر", "#B3202F"], pink: ["Pink", "وردي", "#E58DA6"], white: ["White", "أبيض", "#F7F5F0"],
   yellow: ["Yellow", "أصفر", "#E8C23A"], orange: ["Orange", "برتقالي", "#E8803A"], purple: ["Purple", "بنفسجي", "#8E5BB5"],
-  blue: ["Blue", "أزرق", "#5B86C9"], green: ["Green", "أخضر", "#3E8E5A"],
+  blue: ["Blue", "أزرق", "#5B86C9"], green: ["Green", "أخضر", "#3E8E5A"], mauve: ["Mauve", "موف", "#7341a3"],
 };
 
 const C = { tab: "flowers", cat: "all", q: "" };
@@ -33,13 +33,13 @@ function flowerRows() {
   const groups = A.cats.map((c) => [c, list.filter((f) => f.category_id === c.id)]).filter(([, l]) => l.length);
   return groups.map(([c, l]) => `<section class="c-group"><h2 class="c-group-h">${esc(nameOf(c))} <span class="muted">${l.length}</span></h2>
     <div class="c-list">${l.map((f) => {
-      const p = cover(f);
-      return `<button type="button" class="c-row" data-act="editFlower" data-id="${f.id}">
+    const p = cover(f);
+    return `<button type="button" class="c-row" data-act="editFlower" data-id="${f.id}">
         <span class="c-thumb">${p ? `<img src="${esc(photoUrl(p.path, "thumb"))}" data-full="${esc(photoUrl(p.path))}" alt="" style="${pos(p)}" loading="lazy" decoding="async">` : `<span class="ph" style="--c:${esc(coverHex(f))}">${icon("leaf", 22)}</span>`}</span>
         <span class="c-main"><b>${esc(nameOf(f))}</b><span class="muted">${esc(altOf(f))}</span>
           <span class="c-meta">${esc(unit(colorCount(f), "color"))} · ${nf(photoCount(f))} ${t("photos")} · ${nf(f.stems_per_pack)} ${t("stemsPack")}</span></span>
         <span class="c-end">${f.is_active ? "" : `<span class="badge badge-muted">${t("hidden")}</span>`}${icon("chevronRight", 18, "flip")}</span></button>`;
-    }).join("")}</div></section>`).join("");
+  }).join("")}</div></section>`).join("");
 }
 
 function categoryRows() {
@@ -55,11 +55,11 @@ export function catalogHtml() {
       <button class="btn btn-primary" data-act="${C.tab === "flowers" ? "newFlower" : "newCat"}">${icon("plus", 18)} ${t(C.tab === "flowers" ? "addFlower" : "addCat")}</button></div>
     <div class="seg seg-text" role="group"><button data-act="ctab" data-tab="flowers" aria-pressed="${C.tab === "flowers"}">${t("flowers")}</button><button data-act="ctab" data-tab="cats" aria-pressed="${C.tab === "cats"}">${t("categories")}</button></div>
     ${empty ? `<div class="empty">${icon("layers", 40)}<h2>${t("catalogEmpty")}</h2><p>${t("catalogEmptySub")}</p><button class="btn btn-primary" data-act="seed">${t("seed")}</button></div>`
-    : C.tab === "flowers"
-      ? `<div class="a-tools"><div class="search-box">${icon("search", 18)}<input id="cq" class="input" type="search" placeholder="${esc(t("searchFlowers"))}" value="${esc(C.q)}" aria-label="${esc(t("searchFlowers"))}"></div>
+      : C.tab === "flowers"
+        ? `<div class="a-tools"><div class="search-box">${icon("search", 18)}<input id="cq" class="input" type="search" placeholder="${esc(t("searchFlowers"))}" value="${esc(C.q)}" aria-label="${esc(t("searchFlowers"))}"></div>
          <select class="input" data-act-change="ccat" aria-label="${esc(t("category"))}"><option value="all">${t("allCats")}</option>${A.cats.map((c) => `<option value="${c.id}" ${C.cat === c.id ? "selected" : ""}>${esc(nameOf(c))}</option>`).join("")}</select></div>
          <div id="flowerRows">${flowerRows()}</div>`
-      : categoryRows()}</div>`;
+        : categoryRows()}</div>`;
 }
 
 export function bindCatalog(root) {
@@ -259,8 +259,10 @@ export const catalogActions = {
     if (!f) return;
     const [en, ar, hex] = PRESETS[el.dataset.k] || ["", "", "#E58DA6"];
     try {
-      const [row] = await api("colors", { method: "POST", prefer: "return=representation",
-        body: { flower_id: f.id, name_en: en || "New color", name_ar: ar || "لون جديد", hex, in_stock: true, sort: f.colors.length } });
+      const [row] = await api("colors", {
+        method: "POST", prefer: "return=representation",
+        body: { flower_id: f.id, name_en: en || "New color", name_ar: ar || "لون جديد", hex, in_stock: true, sort: f.colors.length }
+      });
       row.photos = [];
       f.colors.push(row);
       mountFlower(f);
@@ -330,13 +332,15 @@ document.addEventListener("change", (e) => {
 /* ---------- Category editor ---------- */
 function editCategory(c) {
   const isNew = !c;
-  const d = openDialog({ className: "dlg-sm", label: t(isNew ? "addCat" : "editCat"), html: `<form class="dlg-body" id="catForm" novalidate>
+  const d = openDialog({
+    className: "dlg-sm", label: t(isNew ? "addCat" : "editCat"), html: `<form class="dlg-body" id="catForm" novalidate>
     <h2>${t(isNew ? "addCat" : "editCat")}</h2>
     <div class="field"><label for="cf-en">${t("nameEn")}</label><input id="cf-en" class="input" value="${esc(c?.name_en || "")}" required maxlength="60"></div>
     <div class="field"><label for="cf-ar">${t("nameAr")}</label><input id="cf-ar" class="input" dir="rtl" value="${esc(c?.name_ar || "")}" required maxlength="60"></div>
     <div class="two"><div class="field"><label for="cf-sort">${t("sortOrder")}</label><input id="cf-sort" class="input" type="number" inputmode="numeric" value="${c?.sort ?? A.cats.length}"></div>
       <div class="field"><span class="label">${t("visibility")}</span><label class="switch"><input id="cf-active" type="checkbox" ${c?.is_active === false ? "" : "checked"}><span class="track"></span><span>${t("visible")}</span></label></div></div>
-    <div class="dlg-actions">${isNew ? "" : `<button type="button" class="btn btn-ghost danger-text" id="cf-del">${t("delete")}</button>`}<button type="button" class="btn btn-ghost" id="cf-cancel">${t("cancel")}</button><button class="btn btn-primary" type="submit">${t("save")}</button></div></form>` });
+    <div class="dlg-actions">${isNew ? "" : `<button type="button" class="btn btn-ghost danger-text" id="cf-del">${t("delete")}</button>`}<button type="button" class="btn btn-ghost" id="cf-cancel">${t("cancel")}</button><button class="btn btn-primary" type="submit">${t("save")}</button></div></form>`
+  });
   $("#cf-cancel", d).addEventListener("click", () => d.close());
   $("#cf-del", d)?.addEventListener("click", async () => {
     const n = A.flowers.filter((f) => f.category_id === c.id).length;
@@ -376,11 +380,15 @@ const SEED = {
 };
 
 async function seedCatalog() {
-  const cats = await api("categories?on_conflict=slug", { method: "POST", prefer: "return=representation,resolution=merge-duplicates",
-    body: SEED.cats.map(([slug, en, ar], i) => ({ slug, name_en: en, name_ar: ar, sort: i })) });
+  const cats = await api("categories?on_conflict=slug", {
+    method: "POST", prefer: "return=representation,resolution=merge-duplicates",
+    body: SEED.cats.map(([slug, en, ar], i) => ({ slug, name_en: en, name_ar: ar, sort: i }))
+  });
   const catId = Object.fromEntries(cats.map((c) => [c.slug, c.id]));
-  const flowers = await api("flowers?on_conflict=slug", { method: "POST", prefer: "return=representation,resolution=merge-duplicates",
-    body: SEED.flowers.map(([cat, en, ar], i) => ({ category_id: catId[cat], slug: slugify(en), name_en: en, name_ar: ar, sort: i })) });
+  const flowers = await api("flowers?on_conflict=slug", {
+    method: "POST", prefer: "return=representation,resolution=merge-duplicates",
+    body: SEED.flowers.map(([cat, en, ar], i) => ({ category_id: catId[cat], slug: slugify(en), name_en: en, name_ar: ar, sort: i }))
+  });
   const id = Object.fromEntries(flowers.map((f) => [f.slug, f.id]));
   const colors = SEED.flowers.flatMap(([, en, , list]) => list.map((k, j) => ({ flower_id: id[slugify(en)], name_en: PRESETS[k][0], name_ar: PRESETS[k][1], hex: PRESETS[k][2], sort: j })));
   await api("colors", { method: "POST", body: colors });
