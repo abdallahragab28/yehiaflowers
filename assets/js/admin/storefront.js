@@ -86,7 +86,7 @@ async function addSlides(files) {
   for (const file of files) {
     const stop = toast(t("uploading", { a: done + 1, b: files.length }), { ms: 60000 });
     try {
-      const prep = await prepare(file, { fullMax: 1920, thumb: false });
+      const prep = await prepare(file, { fullMax: 2400, quality: 0.88, thumb: false });
       const path = `hero/${prep.id}.${prep.ext}`;
       await uploadFile(path, prep.full.blob);
       const [row] = await api("hero_slides", { method: "POST", body: { path, sort: A.hero.length }, prefer: "return=representation" });

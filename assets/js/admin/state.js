@@ -30,6 +30,29 @@ export async function loadOrders() {
   return fresh;
 }
 
+/**
+ * Lightweight poll: checks ONLY for orders created after the newest known order.
+ * Instead of re-downloading up to 200 orders + items every 25s, this returns []
+ * (2 bytes) when nothing is new, and only the newly created records when orders arrive.
+ */
+export async function checkNewOrders() {
+  if (!A.orders.length) return loadOrders();
+  const latest = A.orders[0]?.created_at;
+  if (!latest) return loadOrders();
+
+  const newRows = await api(
+    `orders?created_at=gt.${encodeURIComponent(latest)}&select=*,${ITEM_FIELDS}&order=created_at.desc`
+  );
+  if (!newRows || !newRows.length) return [];
+
+  const fresh = newRows.filter((o) => !A.seen.has(o.id));
+  if (fresh.length) {
+    fresh.forEach((o) => A.seen.add(o.id));
+    A.orders = [...fresh, ...A.orders];
+  }
+  return fresh;
+}
+
 export async function loadCatalog() {
   const [cats, flowers] = await Promise.all([
     api("categories?select=*&order=sort.asc,name_en.asc"),

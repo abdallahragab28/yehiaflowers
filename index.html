@@ -12,7 +12,9 @@
   <link rel="preconnect" href="https://mfmvoulqbzbptpvbiiok.supabase.co" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Non-blocking font load: render starts immediately, fonts swap in when ready -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
   <link rel="stylesheet" href="/assets/css/base.css">
   <link rel="stylesheet" href="/assets/css/store.css">
   <script type="module" src="/assets/js/store/app.js"></script>
@@ -33,7 +35,7 @@
         <span class="brand-name">YehiaFlowers</span>
       </a>
       <!-- Search: always in the grid on desktop; drops below on mobile -->
-      <div class="search-overlay" id="searchOverlay" aria-hidden="true">
+      <div class="search-overlay" id="searchOverlay">
         <form class="search" id="searchForm" role="search" autocomplete="off">
           <span class="search-ic" id="qIc" aria-hidden="true"></span>
           <input id="q" type="search" enterkeyhint="search" data-t-ph="search" data-t-label="search" spellcheck="false">

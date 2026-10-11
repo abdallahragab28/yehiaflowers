@@ -113,6 +113,7 @@ export const t = makeT({
   changeStatus: ["Change status", "تغيير الحالة"],
   statusSaved: ["Status: {s}", "الحالة: {s}"],
   reply: ["Reply on WhatsApp", "الرد عبر واتساب"],
+  replyInChat: ["Reply in your WhatsApp chat thread", "رُد في محادثة واتساب الخاصة بك"],
   privateNote: ["Private note", "ملاحظة خاصة"],
   privateNotePh: ["Only you can see this", "تظهر لك فقط"],
   saveNote: ["Save note", "حفظ الملاحظة"],

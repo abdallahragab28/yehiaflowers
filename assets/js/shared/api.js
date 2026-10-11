@@ -43,6 +43,16 @@ export function photoUrl(path, size = "full") {
 }
 export const thumbPath = (path) => path.replace(/\.(webp|jpg)$/i, "_t.$1");
 
+/**
+ * Generates a responsive srcset using Supabase's image-transform render endpoint.
+ * Falls back gracefully: if the path already has a query string it returns just the full URL.
+ */
+export function photoSrcset(path) {
+  if (!path || path.includes("?")) return "";
+  const base = `${CFG.url}/storage/v1/render/image/public/${CFG.bucket}/${encodePath(path)}`;
+  return `${base}?width=480&quality=75 480w, ${base}?width=960&quality=80 960w, ${base}?width=1440&quality=82 1440w`;
+}
+
 export async function loadSettings() {
   const rows = await rest("settings?select=key,value");
   return Object.fromEntries(rows.map((r) => [r.key, r.value]));

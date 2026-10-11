@@ -28,12 +28,12 @@ function encode(src, max, quality) {
   );
 }
 
-/** Shrinks a phone photo to a 1600px full version plus a 480px thumbnail (typically 150 KB and 25 KB). */
-export async function prepare(file, { fullMax = 1600, thumb = true } = {}) {
+/** Shrinks a phone photo to a full version plus a 480px thumbnail. */
+export async function prepare(file, { fullMax = 1600, quality = 0.85, thumb = true } = {}) {
   if (!file.type.startsWith("image/")) throw new Error("not an image");
   if (file.size > MAX_INPUT) throw new Error("file too large");
   const src = await decode(file);
-  const full = await encode(src, fullMax, 0.82);
+  const full = await encode(src, fullMax, quality);
   const small = thumb ? await encode(src, 480, 0.78) : null;
   return { id: uid().slice(0, 12), full, thumb: small, ext: full.ext };
 }

@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "rewrites": [
     { "source": "/o/:token", "destination": "/order/index.html" },
@@ -9,7 +11,15 @@
       { "key": "X-Content-Type-Options", "value": "nosniff" },
       { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
     ] },
-    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" }] },
+    { "source": "/(.*\\.html)", "headers": [
+      { "key": "Cache-Control", "value": "no-store" }
+    ] },
+    { "source": "/assets/(.*\\.(js|css))", "headers": [
+      { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+    ] },
+    { "source": "/assets/(.*\\.(webp|jpg|png|ico|svg|woff2))", "headers": [
+      { "key": "Cache-Control", "value": "public, max-age=604800, immutable" }
+    ] },
     { "source": "/admin(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
     { "source": "/o/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }
   ]

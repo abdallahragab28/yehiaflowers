@@ -86,13 +86,21 @@ function revealIn(root) {
   $$("[data-reveal]", root).forEach((el) => { el.classList.add("rv"); io.observe(el); });
 }
 
-/* ---------- Hero slider: fade, dots, arrows, swipe, autoplay that pauses on hover and touch ---------- */
+/* ---------- Hero slider: fade, dots, arrows, swipe, autoplay with pause button (WCAG 2.2.2) ---------- */
 function initHero(root) {
   const hero = $(".hero", root);
   const slides = $$(".hero-slide", hero);
   if (!hero || slides.length < 2) return () => {};
   const dots = $$(".hero-dot", hero);
-  let i = 0, timer = 0, hovering = false, touching = false;
+  const pauseBtn = $("[data-hero='togglePlay']", hero);
+  let i = 0, timer = 0, hovering = false, touching = false, paused = reduceMotion;
+
+  const updatePauseBtn = () => {
+    if (!pauseBtn) return;
+    pauseBtn.innerHTML = icon(paused ? "play" : "pause", 14);
+    pauseBtn.setAttribute("aria-label", t(paused ? "playSlide" : "pauseSlide"));
+    pauseBtn.setAttribute("aria-pressed", paused ? "true" : "false");
+  };
 
   const show = (n) => {
     slides[i].classList.remove("on");
@@ -105,14 +113,21 @@ function initHero(root) {
   };
   const play = () => {
     clearInterval(timer);
-    if (reduceMotion) return;
-    timer = setInterval(() => { if (!hovering && !touching && !document.hidden) show(i + 1); }, 6000);
+    if (reduceMotion || paused) return;
+    timer = setInterval(() => { if (!hovering && !touching && !document.hidden && !paused) show(i + 1); }, 6000);
   };
 
   hero.addEventListener("click", (e) => {
     const b = e.target.closest("[data-hero]");
     if (!b) return;
     const d = b.dataset.hero;
+    if (d === "togglePlay") {
+      paused = !paused;
+      updatePauseBtn();
+      if (paused) clearInterval(timer);
+      else play();
+      return;
+    }
     show(d === "next" ? i + 1 : d === "prev" ? i - 1 : Number(d));
     play();
   });
@@ -132,6 +147,7 @@ function initHero(root) {
     }
   });
   hero.addEventListener("pointercancel", () => { touching = false; x0 = null; });
+  updatePauseBtn();
   play();
   return () => clearInterval(timer);
 }
@@ -409,21 +425,37 @@ window.addEventListener("scroll", () => {
   });
 }, { passive: true });
 
-/* ---------- Search overlay toggle ---------- */
+/* ---------- Search overlay toggle & accessibility ---------- */
 const searchOverlay = $("#searchOverlay");
 const searchBtnEl = $("#searchBtn");
 const searchCloseEl = $("#searchClose");
 const qInputEl = $("#q");
+const isDesktop = matchMedia("(min-width: 860px)");
+
+function syncSearchAria() {
+  if (isDesktop.matches) {
+    searchOverlay.removeAttribute("aria-hidden");
+    searchBtnEl.setAttribute("aria-expanded", "false");
+  } else {
+    const open = searchOverlay.classList.contains("open");
+    searchOverlay.setAttribute("aria-hidden", open ? "false" : "true");
+    searchBtnEl.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+}
+isDesktop.addEventListener("change", syncSearchAria);
+syncSearchAria();
 
 function openSearch() {
   searchOverlay.classList.add("open");
-  searchOverlay.removeAttribute("aria-hidden");
+  searchOverlay.setAttribute("aria-hidden", "false");
   searchBtnEl.setAttribute("aria-expanded", "true");
   setTimeout(() => qInputEl.focus(), 50);
 }
 function closeSearch() {
   searchOverlay.classList.remove("open");
-  searchOverlay.setAttribute("aria-hidden", "true");
+  if (!isDesktop.matches) {
+    searchOverlay.setAttribute("aria-hidden", "true");
+  }
   searchBtnEl.setAttribute("aria-expanded", "false");
   searchBtnEl.focus();
 }

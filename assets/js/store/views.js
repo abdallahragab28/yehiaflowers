@@ -1,5 +1,5 @@
 import { esc, fmtDate, nf, refOf } from "../shared/util.js";
-import { photoUrl, orderLink, siteUrl } from "../shared/api.js";
+import { photoUrl, orderLink, siteUrl, photoSrcset } from "../shared/api.js";
 import { prefs } from "../shared/prefs.js";
 import { isAr, unit, nameOf, altOf, totals } from "../shared/i18n.js";
 import { icon } from "../shared/icons.js";
@@ -79,15 +79,17 @@ function heroHtml() {
     <div class="hero-slides">${slides.map((p, i) => `<div class="hero-slide ${i === 0 ? "on" : ""}" ${many ? `role="group" aria-roledescription="slide" aria-label="${i + 1} / ${slides.length}"` : ""}>
       <img src="${esc(photoUrl(p.path))}" alt="" style="object-position:${p.x}% ${p.y}%" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`).join("")}</div>
     <div class="hero-in">
-      <span class="eyebrow">${icon("leaf", 16)} ${t("w_kicker")}</span>
-      <h1>${t("w_title")}</h1>
-      <p class="lead">${t("w_sub")}</p>
-      <div class="hero-cta">
-        <button type="button" class="btn btn-light btn-lg" data-act="scrollto" data-to="cats">${t("heroCta")} ${icon("arrowDown", 18)}</button>
-        ${S.orders.length ? `<button type="button" class="btn btn-glass btn-lg" data-act="scrollto" data-to="recent">${icon("refresh", 18)} ${t("w_recent")}</button>` : ""}
+      <div class="hero-card">
+        <span class="eyebrow">${icon("leaf", 16)} ${t("w_kicker")}</span>
+        <h1>${t("w_title")}</h1>
+        <p class="lead">${t("w_sub")}</p>
+        <div class="hero-cta">
+          <button type="button" class="btn btn-light btn-lg" data-act="scrollto" data-to="cats">${t("heroCta")} ${icon("arrowDown", 18)}</button>
+          ${S.orders.length ? `<button type="button" class="btn btn-glass btn-lg" data-act="scrollto" data-to="recent">${icon("refresh", 18)} ${t("w_recent")}</button>` : ""}
+        </div>
       </div>
     </div>
-    ${many ? `<div class="hero-ctrl"><div class="hero-dots" role="group">${slides.map((_, i) => `<button type="button" class="hero-dot ${i === 0 ? "on" : ""}" data-hero="${i}" aria-label="${esc(t("slideN", { n: i + 1 }))}" aria-current="${i === 0}"></button>`).join("")}</div>
+    ${many ? `<div class="hero-ctrl"><div class="hero-dots" role="group">${slides.map((_, i) => `<button type="button" class="hero-dot ${i === 0 ? "on" : ""}" data-hero="${i}" aria-label="${esc(t("slideN", { n: i + 1 }))}" aria-current="${i === 0}"></button>`).join("")}<button type="button" class="hero-pause" data-hero="togglePlay" aria-label="${esc(t("pauseSlide"))}" aria-pressed="false">${icon("pause", 14)}</button></div>
       <div class="hero-arrows"><button type="button" class="hero-arrow" data-hero="prev" aria-label="${esc(t("slidePrev"))}">${icon("chevronLeft", 22, "flip")}</button>
       <button type="button" class="hero-arrow" data-hero="next" aria-label="${esc(t("slideNext"))}">${icon("chevronRight", 22, "flip")}</button></div></div>` : ""}
   </section>`;

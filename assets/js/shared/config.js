@@ -8,7 +8,7 @@ export const CFG = Object.freeze({
   key: "sb_publishable_PDUvnwzN5_sNMYCqLGt7BA_CaBkSS1r",
   bucket: "flower-photos",
   /** Public address of the site, used in the order links sent on WhatsApp. Empty = current address. */
-  siteUrl: "",
+  siteUrl: "https://yehiaflowers.vercel.app",
   /** Fallback WhatsApp number. The owner normally sets it in Admin > Settings. */
   whatsapp: "",
 });

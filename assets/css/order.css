@@ -1,7 +1,8 @@
 /* Public order page: a clean, printable receipt with photos. */
 .o-top { background: var(--top); color: #fff; padding-top: var(--safe-t); }
 .o-top-in { max-width: 760px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; min-height: 60px; }
-.o-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.125rem; }
+.o-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.125rem; color: #fff; text-decoration: none; transition: opacity 0.15s ease; }
+.o-brand:hover { opacity: 0.9; }
 .brand-mark { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: rgba(255, 255, 255, 0.14); }
 .o-top-actions { display: flex; align-items: center; gap: 4px; }
 .o-main { max-width: 760px; margin: 0 auto; padding: 16px 16px calc(40px + var(--safe-b)); }

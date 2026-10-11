@@ -9,7 +9,8 @@
   <link rel="preconnect" href="https://mfmvoulqbzbptpvbiiok.supabase.co" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
   <link rel="stylesheet" href="/assets/css/base.css">
   <link rel="stylesheet" href="/assets/css/order.css">
   <script type="module" src="/assets/js/order/main.js"></script>
@@ -17,7 +18,7 @@
 <body>
   <header class="o-top">
     <div class="o-top-in">
-      <span class="o-brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 40a14 14 0 0 1-2.4-27.8C31 10 34 9 38 4c2 4 4 8.4 4 16 0 11-9.6 20-20 20z"/><path d="M4 42c0-6 3.7-10.7 10.2-12C19 29 24 26 26 24"/></svg></span>YehiaFlowers</span>
+      <a class="o-brand" href="/" aria-label="YehiaFlowers"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 40a14 14 0 0 1-2.4-27.8C31 10 34 9 38 4c2 4 4 8.4 4 16 0 11-9.6 20-20 20z"/><path d="M4 42c0-6 3.7-10.7 10.2-12C19 29 24 26 26 24"/></svg></span>YehiaFlowers</a>
       <span class="o-top-actions">
         <button type="button" class="icon-btn on-dark" id="themeBtn" aria-label="Theme"></button>
         <button type="button" class="pill-btn" id="langBtn" lang="en"></button>

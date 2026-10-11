@@ -34,6 +34,9 @@ const flowersQuery = (photoFields) =>
 const CATS_NEW = "categories?select=id,slug,name_en,name_ar,cover_path,cover_focus_x,cover_focus_y&order=sort.asc,name_en.asc";
 const CATS_OLD = "categories?select=id,slug,name_en,name_ar&order=sort.asc,name_en.asc";
 
+const CATALOG_KEY = "yf.catalog.v2";
+const CATALOG_TTL = 10 * 60 * 1000; // 10 minutes
+
 async function fetchAll() {
   const settings = loadSettings().catch(() => ({}));
   try {
@@ -43,28 +46,43 @@ async function fetchAll() {
     ]);
   } catch (err) {
     if (err.status !== 400) throw err;
-    // The database has not been updated with the newest schema.sql yet: use the older, simpler shape.
     return Promise.all([rest(CATS_OLD), rest(flowersQuery("path,sort")), [], settings]);
   }
 }
 
+/** Load from network and persist to localStorage cache. */
+async function fetchAndCache() {
+  const raw = await fetchAll();
+  try { localStorage.setItem(CATALOG_KEY, JSON.stringify({ ts: Date.now(), data: raw.slice(0, 3) })); } catch { /* storage full */ }
+  return raw;
+}
+
+/**
+ * Returns cached catalog data if it is still fresh, otherwise null.
+ * Settings are never cached — they are always fetched live.
+ */
+function getCached() {
+  try {
+    const v = localStorage.getItem(CATALOG_KEY);
+    if (!v) return null;
+    const { ts, data } = JSON.parse(v);
+    if (Date.now() - ts > CATALOG_TTL) return null;
+    return data; // [cats, flowers, hero]
+  } catch { return null; }
+}
+
 const focus = (x, y) => ({ x: Number.isFinite(x) ? x : 50, y: Number.isFinite(y) ? y : 50 });
 
-export async function loadCatalog() {
-  const [cats, flowers, hero, settings] = await fetchAll();
-
+function applyCatalog(cats, flowers, hero, settings) {
   const catById = new Map(cats.map((c) => [c.id, c]));
   S.flowers = flowers
     .filter((f) => f.colors?.length && catById.has(f.category_id))
     .map((f, i) => {
       const cat = catById.get(f.category_id);
       const flower = {
-        ...f,
-        i,
-        cat,
+        ...f, i, cat,
         colors: f.colors.map((c, j) => ({
-          ...c,
-          j,
+          ...c, j,
           photos: (c.photos || []).map((p) => ({ path: p.path, ...focus(p.focus_x, p.focus_y) })),
         })),
       };
@@ -84,6 +102,20 @@ export async function loadCatalog() {
   if (S.shopCat !== "all" && !S.cats.some((c) => c.id === S.shopCat)) S.shopCat = "all";
   pruneCart();
   S.status = "ready";
+}
+
+export async function loadCatalog() {
+  const cached = getCached();
+  if (cached) {
+    // Serve from cache instantly (settings still fetched live — they're tiny)
+    const settings = await loadSettings().catch(() => ({}));
+    applyCatalog(...cached, settings);
+    // Refresh in background; don't await — caller gets the fast path
+    fetchAndCache().then(([c, f, h, s]) => applyCatalog(c, f, h, s)).catch(() => {});
+  } else {
+    const [cats, flowers, hero, settings] = await fetchAndCache();
+    applyCatalog(cats, flowers, hero, settings);
+  }
 }
 
 export const flowersOf = (cat) => S.flowers.filter((f) => f.category_id === cat.id);

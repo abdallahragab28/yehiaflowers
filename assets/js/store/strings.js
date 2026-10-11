@@ -34,6 +34,8 @@ export const t = makeT({
   slideN: ["Go to slide {n}", "الانتقال إلى الشريحة {n}"],
   slidePrev: ["Previous slide", "الشريحة السابقة"],
   slideNext: ["Next slide", "الشريحة التالية"],
+  pauseSlide: ["Pause slide rotation", "إيقاف تدوير الشرائح مؤقتًا"],
+  playSlide: ["Resume slide rotation", "استئناف تدوير الشرائح"],
   ordN: ["Show order {n}", "عرض الطلب {n}"],
   allFlowers: ["All flowers", "كل الزهور"],
   filterAll: ["All", "الكل"],

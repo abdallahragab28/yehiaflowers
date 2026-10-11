@@ -20,6 +20,7 @@ const t = makeT({
   copy: ["Copy link", "نسخ الرابط"],
   copied: ["Link copied", "تم نسخ الرابط"],
   print: ["Print", "طباعة"],
+  storeLink: ["Back to store", "العودة للمتجر"],
   zoom: ["Enlarge photo of {name}", "تكبير صورة {name}"],
   hi: ["Hello, I have a question about order {ref}.", "مرحبًا، لدي سؤال بخصوص الطلب {ref}."],
   notFound: ["Order not found", "لم يتم العثور على الطلب"],
@@ -42,7 +43,7 @@ function chrome() {
 }
 
 function stateBlock(titleKey, subKey) {
-  return `<div class="empty">${icon("alert", 36)}<h1 class="h2">${t(titleKey)}</h1><p>${t(subKey)}</p></div>`;
+  return `<div class="empty">${icon("alert", 36)}<h1 class="h2">${t(titleKey)}</h1><p>${t(subKey)}</p><a class="btn btn-primary" href="/" style="margin-top:16px">${icon("home", 18)} ${t("storeLink")}</a></div>`;
 }
 
 function render() {
@@ -86,6 +87,7 @@ function render() {
       <section class="o-total" aria-label="${esc(t("total"))}"><h2>${t("total")}</h2>
         <dl><div><dt>${t("packs")}</dt><dd>${nf(tt.packs)}</dd></div><div><dt>${t("stems")}</dt><dd>${nf(tt.stems)}</dd></div><div><dt>${t("bunches")}</dt><dd>${nf(tt.bunches)}</dd></div></dl></section>
       <div class="o-actions">
+        <a class="btn btn-primary" href="/">${icon("home", 18)} ${t("storeLink")}</a>
         ${waNumber ? `<a class="btn btn-wa" href="https://wa.me/${waNumber}?text=${encodeURIComponent(t("hi", { ref }))}" target="_blank" rel="noopener">${icon("chat", 18)} ${t("contact")}</a>` : ""}
         <button type="button" class="btn btn-ghost" id="copyBtn">${icon("copy", 18)} ${t("copy")}</button>
         <button type="button" class="btn btn-ghost" id="printBtn">${icon("printer", 18)} ${t("print")}</button>

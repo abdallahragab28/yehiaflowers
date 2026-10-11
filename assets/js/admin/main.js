@@ -1,6 +1,6 @@
 import { login, logout, getSession } from "./auth.js";
 import { rpcA } from "./db.js";
-import { A, bus, loadOrders, loadCatalog, loadAdminSettings, loadHero, newCount } from "./state.js";
+import { A, bus, loadOrders, checkNewOrders, loadCatalog, loadAdminSettings, loadHero, newCount } from "./state.js";
 import { t } from "./strings.js";
 import { ordersHtml, bindOrders, orderActions, openOrder } from "./orders.js";
 import { dashboardHtml } from "./dashboard.js";
@@ -98,11 +98,11 @@ async function enter() {
 async function poll() {
   if (document.hidden || $("dialog[open]")) return;
   try {
-    const fresh = await loadOrders();
+    const fresh = await checkNewOrders();
     if (fresh.length) {
       fresh.slice(0, 3).forEach((o) => toast(t("newOrderFrom", { name: o.customer_name }), { ms: 9000, action: { label: t("open"), onClick: () => openOrder(o.id) } }));
+      if (["orders", "dashboard"].includes(route())) render(); else paintNav();
     }
-    if (["orders", "dashboard"].includes(route())) render(); else paintNav();
   } catch { /* offline: try again on the next tick */ }
 }
 

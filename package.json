@@ -2,8 +2,14 @@
   "name": "yehiaflowers",
   "private": true,
   "version": "1.0.0",
-  "description": "Wholesale cut-flower ordering site with admin panel (Supabase + plain JavaScript, no build step)",
+  "type": "module",
+  "description": "Wholesale cut-flower ordering site with admin panel (Supabase + plain JavaScript)",
   "scripts": {
-    "dev": "npx serve . -l 3000"
+    "dev": "npx serve . -l 3000",
+    "build": "node build.js",
+    "preview": "node build.js && npx serve dist -l 3001"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
   }
 }

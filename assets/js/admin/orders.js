@@ -2,6 +2,7 @@ import { api } from "./db.js";
 import { A, bus, loadOrders, orderTotals, newCount } from "./state.js";
 import { t } from "./strings.js";
 import { $, esc, fmtDate, timeAgo, nf, refOf, waDigits, normSearch, copyText } from "../shared/util.js";
+import { CFG } from "../shared/config.js";
 import { prefs } from "../shared/prefs.js";
 import { unit, nameOf, altOf, statusLabel, STATUSES } from "../shared/i18n.js";
 import { photoUrl, orderLink } from "../shared/api.js";
@@ -59,11 +60,13 @@ export function ordersHtml() {
 
 /* ---------- Detail drawer ---------- */
 function replyLink(o) {
+  const storeNum = waDigits(A.settings.whatsapp_number || CFG.whatsapp || "");
   const ref = refOf(o.public_token);
   const msg = o.lang === "ar"
-    ? `مرحبًا ${o.customer_name}، بخصوص طلبك رقم ${ref}.\n${orderLink(o.public_token)}`
-    : `Hello ${o.customer_name}, regarding your order ${ref}.\n${orderLink(o.public_token)}`;
-  return `https://wa.me/${waDigits(o.customer_phone)}?text=${encodeURIComponent(msg)}`;
+    ? `بخصوص طلب ${o.customer_name} رقم ${ref}:\n${orderLink(o.public_token)}`
+    : `Regarding order #${ref} for ${o.customer_name}:\n${orderLink(o.public_token)}`;
+  // Opens the admin's own WA so they can find the customer's chat easily
+  return storeNum ? `https://wa.me/${storeNum}?text=${encodeURIComponent(msg)}` : null;
 }
 
 function detailHtml(o) {
@@ -87,11 +90,11 @@ function detailHtml(o) {
       <div class="d-actions">${next ? `<button class="btn btn-primary" data-act="setStatus" data-s="${FLOW[idx + 1]}">${t(next)}</button>` : ""}
         <label class="sel"><span class="sr-only">${t("changeStatus")}</span><select class="input" data-act-change="status" aria-label="${esc(t("changeStatus"))}">${STATUSES.map((s) => `<option value="${s}" ${s === o.status ? "selected" : ""}>${esc(statusLabel(s))}</option>`).join("")}</select></label></div>
       <section class="d-card"><h3>${t("customer")}</h3>
-        <p>${icon("phone", 16)} <a href="tel:${esc(o.customer_phone)}" dir="ltr">${esc(o.customer_phone)}</a></p>
+        ${o.customer_phone ? `<p>${icon("phone", 16)} <a href="tel:${esc(o.customer_phone)}" dir="ltr">${esc(o.customer_phone)}</a></p>` : ""}
         ${o.customer_city ? `<p>${icon("pin", 16)} ${esc(o.customer_city)}</p>` : ""}
         <p class="muted">${icon("globe", 16)} ${o.lang === "ar" ? "العربية" : "English"}</p>
         ${o.customer_note ? `<p class="d-note">${esc(o.customer_note)}</p>` : ""}
-        <a class="btn btn-wa btn-block" href="${esc(replyLink(o))}" target="_blank" rel="noopener">${icon("chat", 18)} ${t("reply")}</a></section>
+        ${(() => { const rl = replyLink(o); return rl ? `<a class="btn btn-wa btn-block" href="${esc(rl)}" target="_blank" rel="noopener">${icon("chat", 18)} ${t("reply")}</a>` : `<p class="muted small" style="text-align:center;padding:8px 0">${icon("chat", 16)} ${t("replyInChat")}</p>`; })()}</section>
       <section><h3>${t("items")} <span class="muted">(${o.order_items.length})</span></h3><ul class="d-items">${items}</ul>
         <dl class="d-total"><div><dt>${t("packs")}</dt><dd>${nf(tt.packs)}</dd></div><div><dt>${t("stems")}</dt><dd>${nf(tt.stems)}</dd></div><div><dt>${t("bunches")}</dt><dd>${nf(tt.bunches)}</dd></div></dl></section>
       <section class="d-card"><label for="priv"><h3>${t("privateNote")}</h3></label>

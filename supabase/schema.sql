@@ -84,6 +84,8 @@ create table if not exists public.orders (
 alter table public.orders add column if not exists customer_note text;
 -- Make phone optional for stores that don't collect it
 alter table public.orders alter column customer_phone drop not null;
+-- Store client IP for rate-limiting (never exposed to customers via RLS)
+alter table public.orders add column if not exists client_ip text;
 
 -- Names, color, pack size and cover photo are copied at order time,
 -- so old orders stay correct if the catalog changes later.
@@ -197,7 +199,10 @@ declare
   v_flower public.flowers%rowtype;
   v_cover text;
   v_packs int;
+  v_ip text;
+  v_recent int;
 begin
+  -- ---- Input validation ----
   if length(trim(coalesce(p_name, ''))) not between 2 and 80 then
     raise exception 'invalid name';
   end if;
@@ -208,10 +213,27 @@ begin
     raise exception 'invalid items';
   end if;
 
-  insert into public.orders (customer_name, customer_phone, customer_city, customer_note, lang)
+  -- ---- Per-IP rate limit: max 5 orders per hour ----
+  v_ip := coalesce(
+    current_setting('request.headers', true)::jsonb->>'x-forwarded-for',
+    current_setting('request.headers', true)::jsonb->>'x-real-ip',
+    'unknown'
+  );
+  -- Take only the first IP in a forwarded chain
+  v_ip := trim(split_part(v_ip, ',', 1));
+  select count(*) into v_recent
+  from public.orders
+  where client_ip = v_ip
+    and created_at > now() - interval '1 hour';
+  if v_recent >= 5 then
+    raise exception 'too many orders – please try again later';
+  end if;
+
+  insert into public.orders (customer_name, customer_phone, customer_city, customer_note, lang, client_ip)
   values (trim(p_name), nullif(trim(coalesce(p_phone, '')), ''), nullif(trim(coalesce(p_city, '')), ''),
           nullif(trim(coalesce(p_note, '')), ''),
-          case when p_lang in ('ar', 'en') then p_lang else 'ar' end)
+          case when p_lang in ('ar', 'en') then p_lang else 'ar' end,
+          v_ip)
   returning id, public_token into v_order_id, v_token;
 
   for it in select * from jsonb_array_elements(p_items) loop

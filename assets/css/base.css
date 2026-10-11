@@ -10,7 +10,7 @@
   --ink: #13241b;
   --muted: #5a6a61;
   --line: #dce2da;
-  --line-strong: #c3ccc1;
+  --line-strong: #768779;
   --top: #14452f;
   --btn: #14452f;
   --btn-ink: #ffffff;
@@ -36,7 +36,7 @@
   --ink: #e6efe9;
   --muted: #9eb0a5;
   --line: #27392e;
-  --line-strong: #37503f;
+  --line-strong: #5b7f66;
   --top: #0a120d;
   --btn: #2e7d57;
   --accent: #f08baa;
@@ -56,7 +56,7 @@
     --ink: #e6efe9;
     --muted: #9eb0a5;
     --line: #27392e;
-    --line-strong: #37503f;
+    --line-strong: #5b7f66;
     --top: #0a120d;
     --btn: #2e7d57;
     --accent: #f08baa;
@@ -89,6 +89,7 @@ html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3 { letter-spacing: 0; 
 ul, ol { padding: 0; list-style: none; }
 img, svg { display: block; max-width: 100%; }
 button, input, textarea, select { font: inherit; color: inherit; }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 [hidden] { display: none !important; }
