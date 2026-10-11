@@ -12,7 +12,7 @@ export const makeT = (dict) => (key, vars) => {
 
 // Unit words: [english singular, english plural] and [arabic one, two, few (3-10), many (11+)].
 const UNITS = {
-  pack: [["pack", "packs"], ["عبوة", "عبوتان", "عبوات", "عبوة"]],
+  pack: [["pack", "packs"], ["كرتون", "كرتونا", "كراتين", "كرتونة"]],
   stem: [["stem", "stems"], ["حبة", "حبتان", "حبات", "حبة"]],
   bunch: [["bunch", "bunches"], ["حزمة", "حزمتان", "حزم", "حزمة"]],
   color: [["color", "colors"], ["لون", "لونان", "ألوان", "لون"]],
@@ -20,7 +20,7 @@ const UNITS = {
   item: [["item", "items"], ["صنف", "صنفان", "أصناف", "صنف"]],
 };
 
-/** "3 packs", "عبوتان", "12 عبوة" - correct plural for the chosen language. */
+/** "3 packs", "كرتونتان", "12 كرتون" - correct plural for the chosen language. */
 export function unit(n, name, lang = prefs.lang) {
   const [en, ar] = UNITS[name];
   if (lang === "ar") {

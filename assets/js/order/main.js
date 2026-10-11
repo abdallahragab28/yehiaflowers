@@ -10,7 +10,7 @@ const t = makeT({
   ref: ["Order", "الطلب"],
   for: ["Prepared for", "باسم"],
   items: ["Items", "الأصناف"],
-  packs: ["Packs", "العبوات"],
+  packs: ["Packs", "كراتين"],
   stems: ["Stems", "الحبات"],
   bunches: ["Bunches", "الحزم"],
   total: ["Order total", "إجمالي الطلب"],
@@ -60,8 +60,8 @@ function render() {
   const tracker = cancelled
     ? `<p class="o-cancel">${icon("alert", 18)} ${t("cancelled")}</p>`
     : `<ol class="track" aria-label="${esc(statusLabel(order.status))}">${STEPS.map((s, i) =>
-        `<li class="${i < idx ? "done" : i === idx ? "now" : ""}" ${i === idx ? 'aria-current="step"' : ""}><span class="dot">${i < idx ? icon("check", 14) : i + 1}</span><span class="lbl">${esc(statusLabel(s))}</span></li>`
-      ).join("")}</ol>`;
+      `<li class="${i < idx ? "done" : i === idx ? "now" : ""}" ${i === idx ? 'aria-current="step"' : ""}><span class="dot">${i < idx ? icon("check", 14) : i + 1}</span><span class="lbl">${esc(statusLabel(s))}</span></li>`
+    ).join("")}</ol>`;
 
   const cards = order.items.map((i, n) => {
     const f = { name_en: i.flower_en, name_ar: i.flower_ar };
