@@ -3,24 +3,32 @@
    Used by the store, the order page and the admin panel.
    ========================================================================== */
 :root {
-  --bg: #faf2f4;
+  --bg: #fdf8fa;
   --surface: #ffffff;
-  --surface-2: #f6e3e6;
-  --ink: #2b2024;
-  --muted: #6b5a60;
-  --line: #e8c8cd;
-  --line-strong: #b88a96;
-  --top: #be185d;
-  --btn: #be185d;
+  --surface-glass: rgba(255, 255, 255, 0.82);
+  --surface-2: #f6ecf1;
+  --ink: #2c1b24;
+  --muted: #7e6772;
+  --line: #eedce4;
+  --line-strong: #cfa8bb;
+  --top: rgba(253, 248, 250, 0.86);
+  --top-ink: #2c1b24;
+  --top-line: rgba(238, 220, 228, 0.7);
+  --btn: #9d4b6e;
   --btn-ink: #ffffff;
-  --accent: #831843;
+  --accent: #9d4b6e;
   --accent-ink: #ffffff;
-  --accent-soft: #fce7f3;
+  --accent-soft: #faedf4;
+  --brand-mark-bg: #c93b6e;
+  --brand-mark-ink: #ffffff;
+  --brand-mark-border: #b83363;
+  --brand-mark-shadow: 0 3px 10px rgba(201, 59, 110, 0.28);
   --wa: #167a47;
   --danger: #b3261e;
-  --focus: #1f6feb;
-  --shadow: 0 1px 2px rgba(43, 32, 36, 0.06), 0 6px 20px rgba(43, 32, 36, 0.07);
-  --r: 14px;
+  --focus: #9d4b6e;
+  --shadow: 0 2px 10px rgba(157, 75, 110, 0.05), 0 12px 30px rgba(157, 75, 110, 0.08);
+  --shadow-glass: 0 16px 40px rgba(157, 75, 110, 0.12);
+  --r: 16px;
   --r-sm: 10px;
   --font: "Plus Jakarta Sans", "Cairo", system-ui, -apple-system, "Segoe UI", sans-serif;
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -29,41 +37,59 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #1f1519;
-  --surface: #2a1d22;
-  --surface-2: #35252b;
-  --ink: #f6e3e6;
-  --muted: #cdb2ba;
-  --line: #4a343b;
-  --line-strong: #8f6674;
-  --top: #170f12;
-  --btn: #db2777;
-  --accent: #f9a8d4;
-  --accent-ink: #1a0b11;
-  --accent-soft: #3a2029;
+  --bg: #180f14;
+  --surface: #22151c;
+  --surface-glass: rgba(34, 21, 28, 0.82);
+  --surface-2: #2d1a25;
+  --ink: #fdf2f6;
+  --muted: #c1a8b4;
+  --line: #422533;
+  --line-strong: #7d4d63;
+  --top: rgba(24, 15, 20, 0.88);
+  --top-ink: #fdf2f6;
+  --top-line: rgba(66, 37, 51, 0.7);
+  --btn: #c4648c;
+  --btn-ink: #ffffff;
+  --accent: #f289b2;
+  --accent-ink: #1f0b13;
+  --accent-soft: #381a28;
+  --brand-mark-bg: #c4648c;
+  --brand-mark-ink: #ffffff;
+  --brand-mark-border: #d4749c;
+  --brand-mark-shadow: 0 3px 12px rgba(196, 100, 140, 0.35);
   --danger: #ff8a80;
-  --focus: #6ca8ff;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.35);
+  --focus: #f289b2;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 12px 30px rgba(0, 0, 0, 0.45);
+  --shadow-glass: 0 16px 40px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1f1519;
-    --surface: #2a1d22;
-    --surface-2: #35252b;
-    --ink: #f6e3e6;
-    --muted: #cdb2ba;
-    --line: #4a343b;
-    --line-strong: #8f6674;
-    --top: #170f12;
-    --btn: #db2777;
-    --accent: #f9a8d4;
-    --accent-ink: #1a0b11;
-    --accent-soft: #3a2029;
+    --bg: #180f14;
+    --surface: #22151c;
+    --surface-glass: rgba(34, 21, 28, 0.82);
+    --surface-2: #2d1a25;
+    --ink: #fdf2f6;
+    --muted: #c1a8b4;
+    --line: #422533;
+    --line-strong: #7d4d63;
+    --top: rgba(24, 15, 20, 0.88);
+    --top-ink: #fdf2f6;
+    --top-line: rgba(66, 37, 51, 0.7);
+    --btn: #c4648c;
+    --btn-ink: #ffffff;
+    --accent: #f289b2;
+    --accent-ink: #1f0b13;
+    --accent-soft: #381a28;
+    --brand-mark-bg: #c4648c;
+    --brand-mark-ink: #ffffff;
+    --brand-mark-border: #d4749c;
+    --brand-mark-shadow: 0 3px 12px rgba(196, 100, 140, 0.35);
     --danger: #ff8a80;
-    --focus: #6ca8ff;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.35);
+    --focus: #f289b2;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 12px 30px rgba(0, 0, 0, 0.45);
+    --shadow-glass: 0 16px 40px rgba(0, 0, 0, 0.5);
     color-scheme: dark;
   }
 }
@@ -290,14 +316,15 @@ a {
 
 .btn-light {
   background: #fff;
-  color: #14452f;
+  color: var(--btn);
 }
 
 .btn-glass {
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(6px);
+  background: var(--surface-glass);
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-sm {
@@ -410,7 +437,7 @@ a {
 }
 
 .tag-muted {
-  background: rgba(19, 36, 27, 0.82);
+  background: rgba(44, 27, 36, 0.82);
   color: #fff;
 }
 
@@ -811,7 +838,9 @@ select.input {
 }
 
 .dlg::backdrop {
-  background: rgba(8, 16, 11, 0.62);
+  background: rgba(24, 15, 20, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease;
 }
 
@@ -952,8 +981,9 @@ select.input {
   transform: translateY(-50%);
   width: 52px;
   height: 52px;
-  background: rgba(10, 17, 13, 0.7);
-  backdrop-filter: blur(6px);
+  background: rgba(30, 16, 24, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .lb-nav:active {

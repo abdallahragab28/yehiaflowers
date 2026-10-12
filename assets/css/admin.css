@@ -16,7 +16,7 @@
 .auth-card { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; padding: 28px; border-radius: 20px; background: var(--surface); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35); }
 .auth-card h1 { font-size: 1.5rem; }
 .auth-brand { display: flex; align-items: center; gap: 10px; font-size: 1.125rem; }
-.brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; background: var(--btn); color: #fff; }
+.brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; background: var(--brand-mark-bg); color: var(--brand-mark-ink); border: 1px solid var(--brand-mark-border); box-shadow: var(--brand-mark-shadow); }
 
 /* ---------- Shell ---------- */
 .shell { min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr); }

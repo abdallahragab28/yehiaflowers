@@ -16,7 +16,7 @@ export function applyPrefs() {
   if (prefs.theme) root.dataset.theme = prefs.theme;
   else root.removeAttribute("data-theme");
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = effTheme() === "dark" ? "#0E1712" : "#14452F";
+  if (meta) meta.content = effTheme() === "dark" ? "#180f14" : "#fdf8fa";
 }
 
 export function setLang(lang) {

@@ -14,6 +14,7 @@ const t = makeT({
   stems: ["Stems", "الحبات"],
   bunches: ["Bunches", "الحزم"],
   total: ["Order total", "إجمالي الطلب"],
+  perPack: ["per pack", "بالكرتونة"],
   note: ["Customer note", "ملاحظة العميل"],
   cancelled: ["This order was cancelled.", "تم إلغاء هذا الطلب."],
   contact: ["Contact us on WhatsApp", "تواصل معنا عبر واتساب"],
@@ -72,7 +73,10 @@ function render() {
       : `<div class="o-img ph" style="--c:${esc(i.hex)}">${icon("leaf", 28)}</div>`;
     return `<li class="o-item">${photo}<div class="o-info"><h3>${esc(nameOf(f))}</h3>
       <p class="o-col"><i class="sw" style="--c:${esc(i.hex)}"></i>${esc(nameOf(c))}<span class="alt"> · ${esc(altOf(f))} ${esc(altOf(c))}</span></p>
-      <p class="o-qty"><b>${esc(unit(i.packs, "pack"))}</b><span>${esc(unit(st, "stem"))} · ${esc(unit(Math.round(st / i.stems_per_bunch), "bunch"))}</span></p></div></li>`;
+      <p class="o-qty">
+        <span class="o-packs"><b>${esc(unit(i.packs, "pack"))}</b> <small class="o-per-pack">(${esc(unit(i.stems_per_pack, "stem"))} ${esc(t("perPack"))})</small></span>
+        <span class="o-breakdown">${esc(unit(st, "stem"))} · ${esc(unit(Math.round(st / (i.stems_per_bunch || 1)), "bunch"))}</span>
+      </p></div></li>`;
   }).join("");
 
   app.innerHTML = `<article class="o-card">

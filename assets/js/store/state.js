@@ -229,7 +229,13 @@ export function validateForm() {
 /* ---------- WhatsApp message ---------- */
 /** English header, then the order in Arabic and in English, then a link to the order page. */
 export function buildMessage(lines, token, form = S.form) {
-  const row = (l, lang) => `• ${nameOf(l.flower, lang)} – ${nameOf(l.color, lang)} × ${unit(l.packs, "pack", lang)}`;
+  const row = (l, lang) => {
+    const spp = l.stemsPerPack || l.flower?.stems_per_pack;
+    const sppText = spp
+      ? (lang === "ar" ? ` (${unit(spp, "stem", "ar")} بالكرتونة)` : ` (${unit(spp, "stem", "en")} per pack)`)
+      : "";
+    return `• ${nameOf(l.flower, lang)} – ${nameOf(l.color, lang)} × ${unit(l.packs, "pack", lang)}${sppText}`;
+  };
   const tt = totals(lines);
   const sum = (lang) => `${unit(tt.packs, "pack", lang)} = ${unit(tt.stems, "stem", lang)} = ${unit(tt.bunches, "bunch", lang)}`;
   const out = ["New order", `Name: ${form.name.trim()}`];
