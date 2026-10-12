@@ -219,9 +219,9 @@ export function flowerView(slug) {
 }
 
 /* ---------- Cart ---------- */
-function field(id, label, { value = "", type = "text", auto = "", mode = "", hint = "", err = "", dir = "" } = {}) {
+function field(id, label, { value = "", type = "text", auto = "", mode = "", hint = "", err = "", dir = "", ph = "" } = {}) {
   return `<div class="field"><label for="f-${id}">${label}</label>
-    <input id="f-${id}" class="input ${err ? "is-bad" : ""}" data-f="${id}" type="${type}" ${auto ? `autocomplete="${auto}"` : ""} ${mode ? `inputmode="${mode}"` : ""} ${dir ? `dir="${dir}"` : ""}
+    <input id="f-${id}" class="input ${err ? "is-bad" : ""}" data-f="${id}" type="${type}" ${auto ? `autocomplete="${auto}"` : ""} ${mode ? `inputmode="${mode}"` : ""} ${dir ? `dir="${dir}"` : ""} ${ph ? `placeholder="${esc(ph)}"` : ""}
       value="${esc(value)}" ${err ? `aria-invalid="true" aria-describedby="e-${id}"` : hint ? `aria-describedby="h-${id}"` : ""}>
     ${err ? `<p class="err" id="e-${id}">${esc(t(err))}</p>` : hint ? `<p class="hint" id="h-${id}">${esc(hint)}</p>` : ""}</div>`;
 }
@@ -261,7 +261,7 @@ export function cartView() {
             <div><dt>${t("bunches")}</dt><dd>${nf(tt.bunches)}</dd></div></dl>
           <h2 class="h-sm">${t("details")}</h2>
           <form id="orderForm" novalidate>
-            ${field("name", t("fName"), { value: S.form.name, auto: "name", err: e.name })}
+            ${field("name", t("fName"), { value: S.form.name, auto: "name", ph: t("fNamePh"), err: e.name })}
             <div class="field"><label for="f-note">${t("fNote")}</label><textarea id="f-note" class="input" data-f="note" rows="2" maxlength="300" placeholder="${esc(t("fNotePh"))}">${esc(S.form.note)}</textarea></div>
             <details class="preview"><summary>${t("preview")}</summary><pre id="msgPreview"></pre></details>
             <button type="submit" class="btn btn-wa btn-lg btn-block" id="sendBtn" ${S.sending ? "disabled" : ""}>${icon("chat", 20)} <span>${S.sending ? t("sending") : t("send")}</span></button>
