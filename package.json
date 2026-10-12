@@ -9,7 +9,7 @@
     "build": "node build.js",
     "preview": "node build.js && npx serve dist -l 3001"
   },
-  "devDependencies": {
+  "dependencies": {
     "esbuild": "^0.24.0"
   }
 }
