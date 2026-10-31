@@ -37,8 +37,9 @@ for (const dir of staticDirs) {
     cpSync(dir, join(OUT, dir), { recursive: true });
   } catch { /* dir may not exist */ }
 }
-// Copy favicon and other root-level files
-for (const f of ["favicon.ico"]) {
+// Copy root-level asset files (favicon, OG image, etc.)
+mkdirSync(join(OUT, "assets"), { recursive: true });
+for (const f of ["favicon.ico", "assets/og-preview.jpg"]) {
   try { cpSync(f, join(OUT, f)); } catch {}
 }
 
