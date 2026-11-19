@@ -156,10 +156,15 @@ function categoriesBlock() {
   const cats = S.cats.map((c) => {
     const { photo, hex } = categoryCover(c);
     const n = flowersOf(c).length;
+    const cleanName = esc(nameOf(c)).replace(/_/g, " ");
+    const cleanAlt = esc(altOf(c)).replace(/_/g, " ");
     return `<a class="cat-card" href="#/c/${esc(c.slug)}" data-reveal>
-      ${media(photo, hex, { alt: nameOf(c), cls: "cat-media" })}
-      <div class="cat-body"><div><h3>${esc(nameOf(c))}</h3><p class="alt">${esc(altOf(c))}</p></div>
-      <span class="cat-count">${esc(unit(n, "type"))}</span></div></a>`;
+      ${media(photo, hex, { alt: cleanName, cls: "cat-media" })}
+      <div class="cat-body">
+        <h3 title="${cleanName}">${cleanName}</h3>
+        <p class="alt" title="${cleanAlt}">${cleanAlt}</p>
+        <div class="cat-meta"><span class="cat-count badge badge-soft">${esc(unit(n, "type"))}</span></div>
+      </div></a>`;
   }).join("");
   return `<section class="block" id="cats" aria-labelledby="cats-h"><div class="block-head" data-reveal><h2 id="cats-h">${t("shopTitle")}</h2><p class="muted">${t("shopSub")}</p></div>
     <div class="cat-grid">${cats}</div></section>`;
@@ -289,9 +294,13 @@ export function flowerView(slug) {
     ? `<button type="button" class="g-zoom" data-act="zoom" aria-label="${esc(t("enlarge"))}">${icon("maximize", 16)}</button>`
     : "";
 
+  const fromCat = S.lastBrowse?.type === "category" && S.lastBrowse?.slug === f.cat.slug;
+  const backHref = fromCat ? `#/c/${esc(f.cat.slug)}` : "#/shop";
+  const backLabel = fromCat ? nameOf(f.cat) : t("allFlowers");
+
   return {
     title: `${nameOf(f)} · ${t("brand")}`,
-    html: `<div class="page flower-page">${backLink(`#/c/${esc(f.cat.slug)}`, nameOf(f.cat))}
+    html: `<div class="page flower-page">${backLink(backHref, backLabel)}
       <div class="f-layout">
         <div class="gallery">
           <div class="g-main" id="galleryMain">

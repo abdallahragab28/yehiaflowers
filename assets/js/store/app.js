@@ -46,6 +46,11 @@ function build(r) {
 export function render({ animate = false } = {}) {
   if (S.status !== "ready") return;
   const r = parse();
+  if (r.name === "shop") {
+    S.lastBrowse = { href: "#/shop", type: "shop" };
+  } else if (r.name === "category") {
+    S.lastBrowse = { href: `#/c/${r.arg}`, type: "category", slug: r.arg };
+  }
   const v = build(r);
   const focusId = document.activeElement?.dataset?.fid;
   heroStop();

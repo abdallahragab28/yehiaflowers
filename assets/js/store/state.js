@@ -10,6 +10,7 @@ export const S = {
   flowers: [],
   hero: [], // photos chosen for the hero slider
   shopCat: "all", // category filter on the shop page
+  lastBrowse: { href: "#/shop", type: "shop" }, // tracks previous browsing origin for smart back navigation
   colorBy: new Map(),
   flowerBy: new Map(),
   settings: {},
