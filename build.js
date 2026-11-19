@@ -57,6 +57,9 @@ function patchHtml(src, dest) {
 mkdirSync(`${OUT}`, { recursive: true });
 patchHtml("index.html", `${OUT}/index.html`);
 
+// 404 page
+patchHtml("404.html", `${OUT}/404.html`);
+
 // Order page
 mkdirSync(`${OUT}/order`, { recursive: true });
 patchHtml("order/index.html", `${OUT}/order/index.html`);

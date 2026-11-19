@@ -6,15 +6,13 @@ export const prefs = {
   theme: store.get("yf.theme", ""),
 };
 
-export const effTheme = () =>
-  prefs.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+export const effTheme = () => prefs.theme || "light";
 
 export function applyPrefs() {
   const root = document.documentElement;
   root.lang = prefs.lang;
   root.dir = prefs.lang === "ar" ? "rtl" : "ltr";
-  if (prefs.theme) root.dataset.theme = prefs.theme;
-  else root.removeAttribute("data-theme");
+  root.dataset.theme = effTheme();
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = effTheme() === "dark" ? "#180f14" : "#fdf8fa";
 }

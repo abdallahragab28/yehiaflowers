@@ -36,7 +36,7 @@ function flowerRows() {
     const p = cover(f);
     return `<button type="button" class="c-row" data-act="editFlower" data-id="${f.id}">
         <span class="c-thumb">${p ? `<img src="${esc(photoUrl(p.path, "thumb"))}" data-full="${esc(photoUrl(p.path))}" alt="" style="${pos(p)}" loading="lazy" decoding="async">` : `<span class="ph" style="--c:${esc(coverHex(f))}">${icon("leaf", 22)}</span>`}</span>
-        <span class="c-main"><b>${esc(nameOf(f))}</b><span class="muted">${esc(altOf(f))}</span>
+        <span class="c-main"><b title="${esc(nameOf(f))}">${esc(nameOf(f))}</b><span class="muted" title="${esc(altOf(f))}">${esc(altOf(f))}</span>
           <span class="c-meta">${esc(unit(colorCount(f), "color"))} · ${nf(photoCount(f))} ${t("photos")} · ${nf(f.stems_per_pack)} ${t("stemsPack")}</span></span>
         <span class="c-end">${f.is_active ? "" : `<span class="badge badge-muted">${t("hidden")}</span>`}${icon("chevronRight", 18, "flip")}</span></button>`;
   }).join("")}</div></section>`).join("");
@@ -45,7 +45,7 @@ function flowerRows() {
 function categoryRows() {
   if (!A.cats.length) return `<div class="empty">${icon("layers", 36)}<h2>${t("noCats")}</h2></div>`;
   return `<div class="c-list">${A.cats.map((c) => `<button type="button" class="c-row" data-act="editCat" data-id="${c.id}">
-    <span class="c-main"><b>${esc(nameOf(c))}</b><span class="muted">${esc(altOf(c))} · ${esc(unit(A.flowers.filter((f) => f.category_id === c.id).length, "type"))}</span></span>
+    <span class="c-main"><b title="${esc(nameOf(c))}">${esc(nameOf(c))}</b><span class="muted" title="${esc(altOf(c))}">${esc(altOf(c))} · ${esc(unit(A.flowers.filter((f) => f.category_id === c.id).length, "type"))}</span></span>
     <span class="c-end">${c.is_active ? "" : `<span class="badge badge-muted">${t("hidden")}</span>`}${icon("chevronRight", 18, "flip")}</span></button>`).join("")}</div>`;
 }
 

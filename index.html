@@ -17,6 +17,23 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://yehiaflowers.vercel.app/assets/og-preview.jpg">
   <link rel="preconnect" href="https://mfmvoulqbzbptpvbiiok.supabase.co" crossorigin>
+  <script>
+    try {
+      var c = localStorage.getItem("yf.catalog.v2");
+      if (c) {
+        var d = JSON.parse(c).data;
+        var p = (d && d[2] && d[2][0] && d[2][0].path) || (d && d[1] && d[1][0] && d[1][0].colors && d[1][0].colors[0] && d[1][0].colors[0].photos && d[1][0].colors[0].photos[0] && d[1][0].colors[0].photos[0].path);
+        if (p) {
+          var l = document.createElement("link");
+          l.rel = "preload";
+          l.as = "image";
+          l.href = "https://mfmvoulqbzbptpvbiiok.supabase.co/storage/v1/object/public/photos/" + p.split("/").map(encodeURIComponent).join("/");
+          l.fetchPriority = "high";
+          document.head.appendChild(l);
+        }
+      }
+    } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Non-blocking font load: render starts immediately, fonts swap in when ready -->
@@ -69,11 +86,14 @@
 
   <footer class="foot">
     <div class="foot-in">
-      <b>YehiaFlowers</b>
-      <p data-t="footTag"></p>
+      <div class="foot-brand">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 40a14 14 0 0 1-2.4-27.8C31 10 34 9 38 4c2 4 4 8.4 4 16 0 11-9.6 20-20 20z"/><path d="M4 42c0-6 3.7-10.7 10.2-12C19 29 24 26 26 24"/></svg></span>
+        <b>YehiaFlowers</b>
+      </div>
+      <p class="foot-tag" data-t="footTag"></p>
       <div class="foot-links">
-        <a id="footWa" class="btn btn-ghost btn-sm" href="#" target="_blank" rel="noopener" hidden></a>
-        <a id="footIg" class="btn btn-ghost btn-sm" href="https://www.instagram.com/yehiamostafa.3/" target="_blank" rel="noopener"></a>
+        <a id="footWa" class="foot-pill foot-wa" href="#" target="_blank" rel="noopener" hidden></a>
+        <a id="footIg" class="foot-pill foot-ig" href="https://www.instagram.com/yehiamostafa.3/" target="_blank" rel="noopener"></a>
       </div>
     </div>
   </footer>

@@ -36,20 +36,42 @@ let timer = 0;
 function paintNav() {
   const r = route();
   const n = newCount();
-  const item = (cls, [key, ic, label]) => `<a class="${cls}${key === r ? " on" : ""}" href="#/${key}" ${key === r ? 'aria-current="page"' : ""}>${icon(ic, 22)}<span>${t(label)}</span>${key === "orders" && n ? `<em class="nbadge" aria-label="${esc(t("newOrders", { n }))}">${n}</em>` : ""}</a>`;
-  $("#sideNav").innerHTML = NAV.map((x) => item("nav-i", x)).join("");
-  $("#tabs").innerHTML = NAV.map((x) => item("tab-i", x)).join("");
+  const sideItem = ([key, ic, label]) => `<a class="nav-i${key === r ? " on" : ""}" href="#/${key}" ${key === r ? 'aria-current="page"' : ""}>${icon(ic, 20)}<span>${t(label)}</span>${key === "orders" && n ? `<em class="nbadge" aria-label="${esc(t("newOrders", { n }))}">${n}</em>` : ""}</a>`;
+  const tabItem = ([key, ic, label]) => {
+    const lbl = key === "storefront" ? t("navStorefrontShort") : t(label);
+    return `<a class="tab-i${key === r ? " on" : ""}" href="#/${key}" ${key === r ? 'aria-current="page"' : ""}>${icon(ic, 20)}<span class="tab-lbl">${lbl}</span>${key === "orders" && n ? `<em class="nbadge" aria-label="${esc(t("newOrders", { n }))}">${n}</em>` : ""}</a>`;
+  };
+  $("#sideNav").innerHTML = NAV.map(sideItem).join("");
+  $("#tabs").innerHTML = NAV.map(tabItem).join("");
+  const cur = NAV.find(([k]) => k === r);
+  if ($("#aTopTitle") && cur) $("#aTopTitle").textContent = t(cur[2]);
   document.title = `${n ? `(${n}) ` : ""}${t("adminTitle")}`;
 }
 
 function paintChrome() {
   $$("[data-t]").forEach((el) => (el.textContent = t(el.dataset.t)));
   $$("[data-t-ph]").forEach((el) => (el.placeholder = t(el.dataset.tPh)));
+  $$("[data-t-title]").forEach((el) => (el.title = t(el.dataset.tTitle)));
   $("#themeBtn").innerHTML = icon(effTheme() === "dark" ? "sun" : "moon", 20);
-  $("#langBtn").textContent = prefs.lang === "ar" ? "English" : "العربية";
-  $("#langBtn").lang = prefs.lang === "ar" ? "en" : "ar";
-  $("#loginLang").textContent = prefs.lang === "ar" ? "English" : "العربية";
-  $("#loginLang").lang = prefs.lang === "ar" ? "en" : "ar";
+  if ($("#outBtn")) {
+    $("#outBtn").innerHTML = `${icon("logout", 18, "flip")}<span class="out-text">${esc(t("signOut"))}</span>`;
+    $("#outBtn").title = t("signOut");
+    $("#outBtn").setAttribute("aria-label", t("signOut"));
+  }
+  const isAr = prefs.lang === "ar";
+  const fullTxt = isAr ? "English" : "العربية";
+  const shortTxt = isAr ? "EN" : "عربي";
+  const lFull = $(".lang-full", $("#langBtn"));
+  const lShort = $(".lang-short", $("#langBtn"));
+  if (lFull && lShort) {
+    lFull.textContent = fullTxt;
+    lShort.textContent = shortTxt;
+  } else {
+    $("#langBtn").textContent = fullTxt;
+  }
+  $("#langBtn").lang = isAr ? "en" : "ar";
+  $("#loginLang").textContent = fullTxt;
+  $("#loginLang").lang = isAr ? "en" : "ar";
   paintNav();
 }
 

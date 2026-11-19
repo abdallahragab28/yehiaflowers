@@ -1,5 +1,5 @@
 import { esc, fmtDate, nf, refOf } from "../shared/util.js";
-import { photoUrl, orderLink, siteUrl, photoSrcset } from "../shared/api.js";
+import { photoUrl, orderLink, siteUrl } from "../shared/api.js";
 import { prefs } from "../shared/prefs.js";
 import { isAr, unit, nameOf, altOf, totals } from "../shared/i18n.js";
 import { icon } from "../shared/icons.js";
@@ -12,11 +12,13 @@ import {
 /* ---------- Small building blocks ---------- */
 
 /** A photo (small copy first, full size as fallback) cropped around its focus point, or a tinted placeholder. */
-export function media(photo, hex, { size = "thumb", cls = "", alt = "", eager = false } = {}) {
+export function media(photo, hex, { size = "thumb", cls = "", alt = "", eager = false, w, h } = {}) {
   if (!photo) {
     return `<div class="media ph ${cls}" style="--c:${esc(hex || "#9DB0A5")}" role="img" aria-label="${esc(t("noPhoto"))}">${icon("leaf", 30)}</div>`;
   }
-  return `<div class="media ${cls}"><img src="${esc(photoUrl(photo.path, size))}" data-full="${esc(photoUrl(photo.path))}" alt="${esc(alt)}" style="object-position:${photo.x}% ${photo.y}%" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`;
+  const imgW = w || (size === "full" ? 800 : 400);
+  const imgH = h || (size === "full" ? 600 : 300);
+  return `<div class="media ${cls}"><img src="${esc(photoUrl(photo.path, size))}" data-full="${esc(photoUrl(photo.path))}" alt="${esc(alt)}" width="${imgW}" height="${imgH}" style="object-position:${photo.x}% ${photo.y}%" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`;
 }
 
 const swatch = (hex) => `<i class="sw" style="--c:${esc(hex)}"></i>`;
@@ -41,10 +43,38 @@ export function stepper(color) {
 const emptyState = ({ iconName = "search", title, sub, action = "" }) =>
   `<div class="empty">${icon(iconName, 36)}<h2>${esc(title)}</h2>${sub ? `<p class="muted">${esc(sub)}</p>` : ""}${action}</div>`;
 
-export const notFoundView = () => ({
-  title: t("notFound"),
-  html: `<div class="page">${emptyState({ iconName: "alert", title: t("notFound"), action: `<a class="btn btn-primary" href="#/shop">${t("browse")}</a>` })}</div>`,
-});
+export const notFoundView = () => {
+  const catChips = S.cats?.length
+    ? `<div class="not-found-cats">
+        <p class="not-found-cats-title">${esc(t("browseCats"))}</p>
+        <div class="not-found-cat-chips">
+          ${S.cats.map((c) => `<a class="chip" href="#/c/${esc(c.slug)}">${esc(nameOf(c))}</a>`).join("")}
+        </div>
+      </div>`
+    : "";
+
+  return {
+    title: `${t("notFound")} · ${t("brand")}`,
+    html: `<div class="page narrow not-found-page">
+      <div class="not-found-card">
+        <div class="not-found-badge" aria-hidden="true">
+          <div class="not-found-halo"></div>
+          <span class="not-found-code">404</span>
+          <div class="not-found-icon-wrap">${icon("leaf", 32)}</div>
+        </div>
+        <div class="not-found-body">
+          <h1 class="not-found-title">${esc(t("notFound"))}</h1>
+          <p class="not-found-sub">${esc(t("notFoundSub"))}</p>
+          <div class="not-found-actions">
+            <a class="btn btn-primary btn-lg" href="#/shop">${icon("home", 18)} <span>${esc(t("backToHome"))}</span></a>
+            <a class="btn btn-ghost btn-lg" href="#/shop">${icon("grid", 18)} <span>${esc(t("browseCats"))}</span></a>
+          </div>
+          ${catChips}
+        </div>
+      </div>
+    </div>`,
+  };
+};
 
 const backLink = (href, label) =>
   `<a class="back" href="${href}">${icon("arrowLeft", 18, "flip")}<span>${esc(label)}</span></a>`;
@@ -55,14 +85,17 @@ export function flowerCards(list, mode = S.mode) {
     const cover = coverColor(f);
     const inCart = flowerQty(f);
     const out = !hasStock(f);
-    const dots = f.colors.slice(0, 6).map((c) => swatch(c.hex)).join("");
-    const more = f.colors.length > 6 ? `<span class="more">+${f.colors.length - 6}</span>` : "";
+    const maxDots = 5;
+    const dots = f.colors.slice(0, maxDots).map((c) => swatch(c.hex)).join("");
+    const more = f.colors.length > maxDots ? `<span class="more">+${f.colors.length - maxDots}</span>` : "";
+    const altText = esc(altOf(f)).replace(/_/g, " ");
     return `<a class="f-card ${out ? "is-out" : ""}" href="#/f/${esc(f.slug)}" data-reveal>
       <div class="f-media">${media(cover.photos[0], cover.hex, { alt: nameOf(f) })}
         ${inCart ? `<span class="tag tag-accent">${icon("check", 14)} ${esc(unit(inCart, "pack"))}</span>` : ""}
-        ${out ? `<span class="tag tag-muted">${esc(t("soldOut"))}</span>` : ""}</div>
-      <div class="f-body"><h3>${esc(nameOf(f))}</h3><p class="alt">${esc(altOf(f))}</p>
-        <div class="f-meta"><span class="dots">${dots}${more}</span><span>${esc(unit(f.colors.length, "color"))}</span></div></div></a>`;
+        ${out ? `<span class="tag tag-muted">${esc(t("soldOut"))}</span>` : ""}
+      </div>
+      <div class="f-body"><h3 title="${esc(nameOf(f))}">${esc(nameOf(f))}</h3><p class="alt" title="${altText}">${altText}</p>
+        <div class="f-meta"><span class="dots" aria-hidden="true">${dots}${more}</span><span class="f-count badge badge-soft">${esc(unit(f.colors.length, "color"))}</span></div></div></a>`;
   };
   return `<div class="${mode === "list" ? "f-list" : "f-grid"}">${list.map(card).join("")}</div>`;
 }
@@ -89,9 +122,7 @@ function heroHtml() {
         </div>
       </div>
     </div>
-    ${many ? `<div class="hero-ctrl"><div class="hero-dots" role="group">${slides.map((_, i) => `<button type="button" class="hero-dot ${i === 0 ? "on" : ""}" data-hero="${i}" aria-label="${esc(t("slideN", { n: i + 1 }))}" aria-current="${i === 0}"></button>`).join("")}<button type="button" class="hero-pause" data-hero="togglePlay" aria-label="${esc(t("pauseSlide"))}" aria-pressed="false">${icon("pause", 14)}</button></div>
-      <div class="hero-arrows"><button type="button" class="hero-arrow" data-hero="prev" aria-label="${esc(t("slidePrev"))}">${icon("chevronLeft", 22, "flip")}</button>
-      <button type="button" class="hero-arrow" data-hero="next" aria-label="${esc(t("slideNext"))}">${icon("chevronRight", 22, "flip")}</button></div></div>` : ""}
+    ${many ? `<div class="hero-ctrl"><div class="hero-dots" role="group">${slides.map((_, i) => `<button type="button" class="hero-dot ${i === 0 ? "on" : ""}" data-hero="${i}" aria-label="${esc(t("slideN", { n: i + 1 }))}" aria-current="${i === 0}"></button>`).join("")}</div></div>` : ""}
   </section>`;
 }
 
@@ -183,36 +214,148 @@ export function selectedColor(f) {
   return f.colors.find((c) => c.id === S.sel[f.id]) || f.colors.find((c) => c.in_stock) || f.colors[0];
 }
 
+export function colorActiveCardHtml(color, f) {
+  const activeQty = qty(color.id);
+  const cleanColorAlt = esc(altOf(color)).replace(/_/g, " ");
+  const activeColorStems = activeQty * f.stems_per_pack;
+  return `<div class="cac-main">
+    <div class="cac-title-row">
+      <b class="cac-name">${esc(nameOf(color))}</b>
+      <span class="cac-alt">${cleanColorAlt}</span>
+    </div>
+    <div class="cac-status">
+      ${color.in_stock ? `<span class="cac-stock in">${icon("check", 12)} ${t("inStock")}</span>` : `<span class="cac-stock out">${t("soldOut")}</span>`}
+      ${activeQty ? `<span class="cac-yield">${unit(activeColorStems, "stem")}</span>` : ""}
+    </div>
+  </div>
+  <div class="cac-action">
+    ${color.in_stock ? stepper(color) : `<span class="badge badge-muted">${esc(t("soldOut"))}</span>`}
+  </div>`;
+}
+
 export function flowerView(slug) {
   const f = S.flowers.find((x) => x.slug === slug);
   if (!f) return notFoundView();
   const color = selectedColor(f);
-  const photos = color.photos;
-  const idx = Math.min(S.photo, Math.max(0, photos.length - 1));
-  const alt = `${nameOf(f)} ${nameOf(color)}`;
-  const rows = f.colors.map((c) => `<li class="crow ${c.id === color.id ? "sel" : ""} ${c.in_stock ? "" : "oos"}">
-      <button type="button" class="crow-main" data-act="color" data-c="${c.id}" data-fid="color:${c.id}" aria-pressed="${c.id === color.id}">
-        ${swatch(c.hex)}<span class="crow-t"><b>${esc(nameOf(c))}</b><small>${esc(altOf(c))} · ${esc(c.in_stock ? t("inStock") : t("soldOut"))}</small></span></button>
-      ${c.in_stock ? stepper(c) : `<span class="badge badge-muted">${esc(t("soldOut"))}</span>`}</li>`).join("");
-  const thumbs = photos.length > 1
-    ? `<div class="g-thumbs">${photos.map((p, i) => `<button type="button" class="g-th ${i === idx ? "on" : ""}" data-act="photo" data-i="${i}" data-fid="photo:${i}" aria-label="${esc(t("photoN", { n: i + 1 }))}" aria-pressed="${i === idx}">${media(p, color.hex, { cls: "g-thimg" })}</button>`).join("")}</div>`
+  const hasMultiple = f.colors.length > 1;
+  const activeQty = qty(color.id);
+  const totalPacks = flowerQty(f);
+  const totalStems = totalPacks * (f.stems_per_pack || 0);
+  const stemText = unit(totalStems, "stem");
+  const totalOrderBadge = totalPacks > 0
+    ? `<a href="#/cart" class="badge badge-order-total" aria-label="${esc(t("flowerOrderTotal", { packs: unit(totalPacks, "pack"), stems: stemText }))}" title="${esc(t("cart"))}">${icon("cart", 14)}<span>${esc(t("flowerOrderTotal", { packs: unit(totalPacks, "pack"), stems: stemText }))}</span></a>`
     : "";
+  const cleanFlowerAlt = esc(altOf(f)).replace(/_/g, " ");
+  const bunches = Math.round(f.stems_per_pack / (f.stems_per_bunch || 1));
+  const bunchSummary = f.stems_per_bunch > 1
+    ? (isAr() ? `حزمة (${unit(f.stems_per_bunch, "stem")}/حزمة)` : `Bunches (${unit(f.stems_per_bunch, "stem")}/ea)`)
+    : (isAr() ? "حبات مفردة" : "Single stems");
+
+  // Collect all slides across all colors of this flower so swipe gestures work seamlessly
+  const allSlides = [];
+  f.colors.forEach((c) => {
+    const cPhotos = c.photos && c.photos.length ? c.photos : [null];
+    cPhotos.forEach((p, pIdx) => {
+      allSlides.push({
+        photo: p,
+        color: c,
+        pIdx,
+        alt: `${nameOf(f)} ${nameOf(c)}${c.photos && c.photos.length > 1 ? ` ${pIdx + 1}` : ""}`,
+      });
+    });
+  });
+
+  const initSlideIdx = Math.max(0, allSlides.findIndex((s) => s.color.id === color.id));
+  const hasMultipleSlides = allSlides.length > 1;
+
+  const slidesHtml = allSlides.map((s, i) => {
+    const isEager = i === initSlideIdx;
+    return `<div class="g-slide" data-i="${i}" data-c="${s.color.id}" data-pidx="${s.pIdx}">
+      <button type="button" class="g-slide-btn" data-act="zoom" data-c="${s.color.id}" data-i="${s.pIdx}" aria-label="${esc(t("enlarge"))}: ${esc(s.alt)}">
+        ${media(s.photo, s.color.hex, { size: "full", alt: s.alt, cls: "g-img", eager: isEager, w: 800, h: 800 })}
+      </button>
+    </div>`;
+  }).join("");
+
+  const dotsHtml = hasMultipleSlides
+    ? `<div class="g-counter-wrap"><button type="button" class="g-counter" data-act="zoom" aria-label="${esc(t("enlarge"))}: ${initSlideIdx + 1} / ${allSlides.length}"><span id="gCurSlide">${initSlideIdx + 1}</span><span class="g-counter-sep">/</span><span>${allSlides.length}</span></button></div>`
+    : "";
+
+  const arrowsHtml = hasMultipleSlides
+    ? `<button type="button" class="g-arrow prev" data-act="gprev" aria-label="${esc(t("prev"))}">${icon("chevronLeft", 18, "flip")}</button><button type="button" class="g-arrow next" data-act="gnext" aria-label="${esc(t("next"))}">${icon("chevronRight", 18, "flip")}</button>`
+    : "";
+
+  const zoomBtn = allSlides.some((s) => s.photo)
+    ? `<button type="button" class="g-zoom" data-act="zoom" aria-label="${esc(t("enlarge"))}">${icon("maximize", 16)}</button>`
+    : "";
+
   return {
     title: `${nameOf(f)} · ${t("brand")}`,
-    html: `<div class="page">${backLink(`#/c/${esc(f.cat.slug)}`, nameOf(f.cat))}
+    html: `<div class="page flower-page">${backLink(`#/c/${esc(f.cat.slug)}`, nameOf(f.cat))}
       <div class="f-layout">
         <div class="gallery">
-          ${photos.length
-            ? `<button type="button" class="g-main" data-act="zoom" data-i="${idx}" aria-label="${esc(t("enlarge"))}">${media(photos[idx], color.hex, { size: "full", alt, cls: "g-img", eager: true })}<span class="g-zoom">${icon("search", 16)}</span></button>`
-            : `<div class="g-main">${media(null, color.hex, { cls: "g-img" })}</div>`}
-          ${thumbs}
+          <div class="g-main" id="galleryMain">
+            <div class="g-track" id="galleryTrack" tabindex="0" role="region" aria-label="${esc(nameOf(f))}">
+              ${slidesHtml}
+            </div>
+            ${zoomBtn}
+            ${arrowsHtml}
+            ${dotsHtml}
+          </div>
         </div>
         <div class="f-info">
-          <div class="page-head"><h1>${esc(nameOf(f))}</h1><p class="muted">${esc(altOf(f))}</p></div>
-          <div class="spec">${icon("package", 22)}<div><b>${t("spec")}</b><span>${esc(specText(f))}</span></div></div>
-          <h2 class="h-sm">${t("colorsTitle")}</h2>
-          <p class="muted hint">${t("colorsHint")}</p>
-          <ul class="crows">${rows}</ul>
+          <div class="page-head">
+            <div class="page-head-title-row">
+              <h1>${esc(nameOf(f))}</h1>
+              ${totalOrderBadge}
+            </div>
+            <div class="page-head-sub">
+              <span class="muted">${cleanFlowerAlt}</span>
+              ${hasMultiple ? `<span class="page-head-sep">·</span><span class="muted">${esc(unit(f.colors.length, "color"))}</span>` : ""}
+            </div>
+          </div>
+
+          <div class="color-section">
+            <div class="color-head">
+              <h2 class="h-sm">${t("colorsTitle")}</h2>
+            </div>
+
+            ${hasMultiple ? `
+            <div class="color-swatches-wrap">
+              <div class="color-swatches" role="radiogroup" aria-label="${esc(t("colorsTitle"))}">
+                ${f.colors.map((c) => {
+          const isSel = c.id === color.id;
+          const countInCart = qty(c.id);
+          return `<button type="button" class="csw ${isSel ? "on" : ""} ${c.in_stock ? "" : "oos"}" data-act="color" data-c="${c.id}" data-fid="color:${c.id}" style="--c:${esc(c.hex)}" aria-label="${esc(nameOf(c))}${c.in_stock ? "" : " (" + t("soldOut") + ")"}" aria-pressed="${isSel}" title="${esc(nameOf(c))} (${esc(altOf(c))})">
+                    <span class="csw-dot"></span>
+                    ${countInCart ? `<span class="csw-badge">${countInCart}</span>` : ""}
+                  </button>`;
+        }).join("")}
+              </div>
+            </div>` : ""}
+
+            <div class="color-active-card ${activeQty ? "has-qty" : ""}" id="colorActiveCard">
+              ${colorActiveCardHtml(color, f)}
+            </div>
+          </div>
+
+          <div class="pack-card">
+            <div class="pack-card-head">
+              ${icon("package", 15)}
+              <span>${t("spec")}</span>
+            </div>
+            <div class="pack-card-grid">
+              <div class="pack-stat">
+                <span class="pack-stat-val">${esc(f.stems_per_pack)}</span>
+                <span class="pack-stat-lbl">${isAr() ? "حبة في الكرتونة" : "Stems / pack"}</span>
+              </div>
+              <div class="pack-stat-sep" aria-hidden="true"></div>
+              <div class="pack-stat">
+                <span class="pack-stat-val">${bunches}</span>
+                <span class="pack-stat-lbl">${esc(bunchSummary)}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div></div>`,
   };
@@ -241,13 +384,13 @@ export function cartView() {
     const f = ls[0].flower;
     return `<section class="card grp"><header class="grp-h"><h3>${esc(nameOf(f))}</h3><span class="muted">${esc(specText(f))}</span></header>
       <ul class="lines">${ls.map((l) => {
-        const lt = totals([lineOf(l)]);
-        const label = `${nameOf(f)} ${nameOf(l.color)}`;
-        return `<li class="line" data-line="${l.color.id}">
+      const lt = totals([lineOf(l)]);
+      const label = `${nameOf(f)} ${nameOf(l.color)}`;
+      return `<li class="line" data-line="${l.color.id}">
           <button type="button" class="line-img" data-act="zoomc" data-c="${l.color.id}" aria-label="${esc(t("checkPhotos", { name: label }))}">${media(l.color.photos[0], l.color.hex, { alt: label })}</button>
           <div class="line-t"><b class="line-n">${swatch(l.color.hex)}${esc(nameOf(l.color))}</b><small>${esc(unit(lt.stems, "stem"))} · ${esc(unit(lt.bunches, "bunch"))}</small></div>
           <div class="line-a">${stepper(l.color)}<button type="button" class="icon-btn" data-act="del" data-c="${l.color.id}" aria-label="${esc(t("remove"))}: ${esc(label)}">${icon("trash", 18)}</button></div></li>`;
-      }).join("")}</ul></section>`;
+    }).join("")}</ul></section>`;
   }).join("");
   const e = S.errors;
   return {
