@@ -231,8 +231,8 @@ export function shopView() {
   return {
     title: t("brand"),
     hero: true,
-    html: `${ heroHtml() }${ marketStrip() } <div class="page">${/* recentOrders() */ ""}${categoriesBlock()}
-    <section class="block" id="all" aria-labelledby="all-h"><div id="allBlock">${allFlowersInner()}</div></section></div>`,
+    html: `${heroHtml()}${marketStrip()}<div class="page">${/* recentOrders() */ ""}${categoriesBlock()}
+      <section class="block" id="all" aria-labelledby="all-h"><div id="allBlock">${allFlowersInner()}</div></section></div>`,
   };
 }
 
@@ -244,13 +244,13 @@ export function categoryView(slug) {
   if (S.stockOnly) list = list.filter(hasStock);
   else list = byStock(list);
   return {
-    title: `${ nameOf(cat) } · ${ t("brand") } `,
-    html: `< div class="page" > ${ backLink("#/shop", t("allCats")) }
+    title: `${nameOf(cat)} · ${t("brand")}`,
+    html: `<div class="page">${backLink("#/shop", t("allCats"))}
       <div class="page-head"><h1>${esc(nameOf(cat))}</h1><p class="muted">${esc(altOf(cat))} · ${esc(unit(flowersOf(cat).length, "type"))}</p></div>
       <div class="toolbar">
         <label class="switch"><input type="checkbox" data-act="stock" ${S.stockOnly ? "checked" : ""}><span class="track" aria-hidden="true"></span><span>${t("stockOnly")}</span></label>
         ${viewToggle()}</div>
-      ${ list.length ? flowerCards(list) : emptyState({ title: t("emptyCat") }) }</div > `,
+      ${list.length ? flowerCards(list) : emptyState({ title: t("emptyCat") })}</div>`,
   };
 }
 
@@ -263,7 +263,7 @@ export function colorActiveCardHtml(color, f) {
   const activeQty = qty(color.id);
   const cleanColorAlt = esc(altOf(color)).replace(/_/g, " ");
   const activeColorStems = activeQty * f.stems_per_pack;
-  return `< div class="cac-main" >
+  return `<div class="cac-main">
     <div class="cac-title-row">
       <b class="cac-name">${esc(nameOf(color))}</b>
       <span class="cac-alt">${cleanColorAlt}</span>
@@ -272,10 +272,10 @@ export function colorActiveCardHtml(color, f) {
       ${color.in_stock ? `<span class="cac-stock in">${icon("check", 12)} ${t("inStock")}</span>` : `<span class="cac-stock out">${t("soldOut")}</span>`}
       ${activeQty ? `<span class="cac-yield">${unit(activeColorStems, "stem")}</span>` : ""}
     </div>
-  </div >
-    <div class="cac-action">
-      ${color.in_stock ? stepper(color) : `<span class="badge badge-muted">${esc(t("soldOut"))}</span>`}
-    </div>`;
+  </div>
+  <div class="cac-action">
+    ${color.in_stock ? stepper(color) : `<span class="badge badge-muted">${esc(t("soldOut"))}</span>`}
+  </div>`;
 }
 
 export function flowerView(slug) {
@@ -288,13 +288,12 @@ export function flowerView(slug) {
   const totalStems = totalPacks * (f.stems_per_pack || 0);
   const stemText = unit(totalStems, "stem");
   const totalOrderBadge = totalPacks > 0
-    ? `< a href = "#/cart" class="badge badge-order-total" aria - label="${esc(t("flowerOrderTotal", { packs: unit(totalPacks, "pack"), stems: stemText }))}" title = "${esc(t("cart"))}" > ${ icon("cart", 14) } <span>${esc(t("flowerOrderTotal", { packs: unit(totalPacks, "pack"), stems: stemText }))}</span></a > `
+    ? `<a href="#/cart" class="badge badge-order-total" aria-label="${esc(t("flowerOrderTotal", { packs: unit(totalPacks, "pack"), stems: stemText }))}" title="${esc(t("cart"))}">${icon("cart", 14)}<span>${esc(t("flowerOrderTotal", { packs: unit(totalPacks, "pack"), stems: stemText }))}</span></a>`
     : "";
   const cleanFlowerAlt = esc(altOf(f)).replace(/_/g, " ");
   const bunches = Math.round(f.stems_per_pack / (f.stems_per_bunch || 1));
   const bunchSummary = f.stems_per_bunch > 1
-    ? (isAr() ? `حزمة(${ unit(f.stems_per_bunch, "stem")
-} /حزمة)` : `Bunches (${unit(f.stems_per_bunch, "stem")}/ea)`)
+    ? (isAr() ? `حزمة (${unit(f.stems_per_bunch, "stem")}/حزمة)` : `Bunches (${unit(f.stems_per_bunch, "stem")}/ea)`)
     : (isAr() ? "حبات مفردة" : "Single stems");
 
   // Collect all slides across all colors of this flower so swipe gestures work seamlessly
@@ -306,7 +305,7 @@ export function flowerView(slug) {
         photo: p,
         color: c,
         pIdx,
-        alt: `${ nameOf(f) } ${ nameOf(c) }${ c.photos && c.photos.length > 1 ? ` ${pIdx + 1}` : "" } `,
+        alt: `${nameOf(f)} ${nameOf(c)}${c.photos && c.photos.length > 1 ? ` ${pIdx + 1}` : ""}`,
       });
     });
   });
@@ -316,115 +315,115 @@ export function flowerView(slug) {
 
   const slidesHtml = allSlides.map((s, i) => {
     const isEager = i === initSlideIdx;
-    return `< div class="g-slide" data - i="${i}" data - c="${s.color.id}" data - pidx="${s.pIdx}" >
-  <button type="button" class="g-slide-btn" data-act="zoom" data-c="${s.color.id}" data-i="${s.pIdx}" aria-label="${esc(t(" enlarge"))}: ${esc(s.alt)}" >
-    ${ media(s.photo, s.color.hex, { size: "full", alt: s.alt, cls: "g-img", eager: isEager, w: 800, h: 800 }) }
-      </button >
-    </div > `;
+    return `<div class="g-slide" data-i="${i}" data-c="${s.color.id}" data-pidx="${s.pIdx}">
+      <button type="button" class="g-slide-btn" data-act="zoom" data-c="${s.color.id}" data-i="${s.pIdx}" aria-label="${esc(t("enlarge"))}: ${esc(s.alt)}">
+        ${media(s.photo, s.color.hex, { size: "full", alt: s.alt, cls: "g-img", eager: isEager, w: 800, h: 800 })}
+      </button>
+    </div>`;
   }).join("");
 
   const dotsHtml = hasMultipleSlides
-    ? `< div class="g-counter-wrap" > <button type="button" class="g-counter" data-act="zoom" aria-label="${esc(t(" enlarge"))}: ${initSlideIdx + 1} / ${allSlides.length}" ><span id="gCurSlide">${initSlideIdx + 1}</span><span class="g-counter-sep">/</span><span>${allSlides.length}</span></button ></div > `
+    ? `<div class="g-counter-wrap"><button type="button" class="g-counter" dir="ltr" data-act="zoom" aria-label="${esc(t("enlarge"))}: ${initSlideIdx + 1} / ${allSlides.length}"><span id="gCurSlide">${initSlideIdx + 1}</span><span class="g-counter-sep">/</span><span>${allSlides.length}</span></button></div>`
     : "";
 
   const arrowsHtml = hasMultipleSlides
-    ? `< button type = "button" class="g-arrow prev" data - act="gprev" aria - label="${esc(t("prev"))}" > ${ icon("chevronLeft", 18, "flip") }</button > <button type="button" class="g-arrow next" data-act="gnext" aria-label="${esc(t(" next"))}" > ${ icon("chevronRight", 18, "flip") }</button > `
+    ? `<button type="button" class="g-arrow prev" data-act="gprev" aria-label="${esc(t("prev"))}">${icon("chevronLeft", 18, "flip")}</button><button type="button" class="g-arrow next" data-act="gnext" aria-label="${esc(t("next"))}">${icon("chevronRight", 18, "flip")}</button>`
     : "";
 
   const zoomBtn = allSlides.some((s) => s.photo)
-    ? `< button type = "button" class="g-zoom" data - act="zoom" aria - label="${esc(t("enlarge"))}" > ${ icon("maximize", 16) }</button > `
+    ? `<button type="button" class="g-zoom" data-act="zoom" aria-label="${esc(t("enlarge"))}">${icon("maximize", 16)}</button>`
     : "";
 
   const fromCat = S.lastBrowse?.type === "category" && S.lastBrowse?.slug === f.cat.slug;
-  const backHref = fromCat ? `# / c / ${ esc(f.cat.slug) } ` : "#/shop";
+  const backHref = fromCat ? `#/c/${esc(f.cat.slug)}` : "#/shop";
   const backLabel = fromCat ? nameOf(f.cat) : t("allFlowers");
 
   return {
-    title: `${ nameOf(f) } · ${ t("brand") } `,
-    html: `< div class="page flower-page" > ${ backLink(backHref, backLabel) }
-<div class="f-layout">
-  <div class="gallery">
-    <div class="g-main" id="galleryMain">
-      <div class="g-track" id="galleryTrack" tabindex="0" role="region" aria-label="${esc(nameOf(f))}">
-        ${slidesHtml}
-      </div>
-      ${zoomBtn}
-      ${arrowsHtml}
-      ${dotsHtml}
-    </div>
-  </div>
-  <div class="f-info">
-    <div class="page-head">
-      <div class="page-head-title-row">
-        <h1>${esc(nameOf(f))}</h1>
-        ${totalOrderBadge}
-      </div>
-      <div class="page-head-sub">
-        <span class="muted">${cleanFlowerAlt}</span>
-        ${hasMultiple ? `<span class="page-head-sep">·</span><span class="muted">${esc(unit(f.colors.length, "color"))}</span>` : ""}
-      </div>
-    </div>
+    title: `${nameOf(f)} · ${t("brand")}`,
+    html: `<div class="page flower-page">${backLink(backHref, backLabel)}
+      <div class="f-layout">
+        <div class="gallery">
+          <div class="g-main" id="galleryMain">
+            <div class="g-track" id="galleryTrack" tabindex="0" role="region" aria-label="${esc(nameOf(f))}">
+              ${slidesHtml}
+            </div>
+            ${zoomBtn}
+            ${arrowsHtml}
+            ${dotsHtml}
+          </div>
+        </div>
+        <div class="f-info">
+          <div class="page-head">
+            <div class="page-head-title-row">
+              <h1>${esc(nameOf(f))}</h1>
+              ${totalOrderBadge}
+            </div>
+            <div class="page-head-sub">
+              <span class="muted">${cleanFlowerAlt}</span>
+              ${hasMultiple ? `<span class="page-head-sep">·</span><span class="muted">${esc(unit(f.colors.length, "color"))}</span>` : ""}
+            </div>
+          </div>
 
-    <div class="color-section">
-      <div class="color-head">
-        <h2 class="h-sm">${t("colorsTitle")}</h2>
-      </div>
+          <div class="color-section">
+            <div class="color-head">
+              <h2 class="h-sm">${t("colorsTitle")}</h2>
+            </div>
 
-      ${hasMultiple ? `
+            ${hasMultiple ? `
             <div class="color-swatches-wrap">
               <div class="color-swatches" role="radiogroup" aria-label="${esc(t("colorsTitle"))}">
                 ${f.colors.map((c) => {
-        const isSel = c.id === color.id;
-        const countInCart = qty(c.id);
-        return `<button type="button" class="csw ${isSel ? "on" : ""} ${c.in_stock ? "" : "oos"}" data-act="color" data-c="${c.id}" data-fid="color:${c.id}" style="--c:${esc(c.hex)}" aria-label="${esc(nameOf(c))}${c.in_stock ? "" : " (" + t("soldOut") + ")"}" aria-pressed="${isSel}" title="${esc(nameOf(c))} (${esc(altOf(c))})">
+          const isSel = c.id === color.id;
+          const countInCart = qty(c.id);
+          return `<button type="button" class="csw ${isSel ? "on" : ""} ${c.in_stock ? "" : "oos"}" data-act="color" data-c="${c.id}" data-fid="color:${c.id}" style="--c:${esc(c.hex)}" aria-label="${esc(nameOf(c))}${c.in_stock ? "" : " (" + t("soldOut") + ")"}" aria-pressed="${isSel}" title="${esc(nameOf(c))} (${esc(altOf(c))})">
                     <span class="csw-dot"></span>
                     ${countInCart ? `<span class="csw-badge">${countInCart}</span>` : ""}
                   </button>`;
-      }).join("")}
+        }).join("")}
               </div>
             </div>` : ""}
 
-      <div class="color-active-card ${activeQty ? " has-qty" : ""}" id="colorActiveCard">
-      ${colorActiveCardHtml(color, f)}
-    </div>
-  </div>
+            <div class="color-active-card ${activeQty ? "has-qty" : ""}" id="colorActiveCard">
+              ${colorActiveCardHtml(color, f)}
+            </div>
+          </div>
 
-  <div class="pack-card">
-    <div class="pack-card-head">
-      ${icon("package", 15)}
-      <span>${t("spec")}</span>
-    </div>
-    <div class="pack-card-grid">
-      <div class="pack-stat">
-        <span class="pack-stat-val">${esc(f.stems_per_pack)}</span>
-        <span class="pack-stat-lbl">${isAr() ? "حبة في الكرتونة" : "Stems / pack"}</span>
-      </div>
-      <div class="pack-stat-sep" aria-hidden="true"></div>
-      <div class="pack-stat">
-        <span class="pack-stat-val">${bunches}</span>
-        <span class="pack-stat-lbl">${esc(bunchSummary)}</span>
-      </div>
-    </div>
-  </div>
-</div>
-      </div ></div > `,
+          <div class="pack-card">
+            <div class="pack-card-head">
+              ${icon("package", 15)}
+              <span>${t("spec")}</span>
+            </div>
+            <div class="pack-card-grid">
+              <div class="pack-stat">
+                <span class="pack-stat-val">${esc(f.stems_per_pack)}</span>
+                <span class="pack-stat-lbl">${isAr() ? "حبة في الكرتونة" : "Stems / pack"}</span>
+              </div>
+              <div class="pack-stat-sep" aria-hidden="true"></div>
+              <div class="pack-stat">
+                <span class="pack-stat-val">${bunches}</span>
+                <span class="pack-stat-lbl">${esc(bunchSummary)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>`,
   };
 }
 
 /* ---------- Cart ---------- */
 function field(id, label, { value = "", type = "text", auto = "", mode = "", hint = "", err = "", dir = "", ph = "" } = {}) {
-  return `< div class="field" ><label for="f-${id}">${label}</label>
-    <input id="f-${id}" class="input ${err ? "is-bad" : ""}" data - f="${id}" type = "${type}" ${ auto ? `autocomplete="${auto}"` : "" } ${ mode ? `inputmode="${mode}"` : "" } ${ dir ? `dir="${dir}"` : "" } ${ ph ? `placeholder="${esc(ph)}"` : "" }
-value = "${esc(value)}" ${ err ? `aria-invalid="true" aria-describedby="e-${id}"` : hint ? `aria-describedby="h-${id}"` : "" }>
-  ${ err ? `<p class="err" id="e-${id}">${esc(t(err))}</p>` : hint ? `<p class="hint" id="h-${id}">${esc(hint)}</p>` : "" }</div > `;
+  return `<div class="field"><label for="f-${id}">${label}</label>
+    <input id="f-${id}" class="input ${err ? "is-bad" : ""}" data-f="${id}" type="${type}" ${auto ? `autocomplete="${auto}"` : ""} ${mode ? `inputmode="${mode}"` : ""} ${dir ? `dir="${dir}"` : ""} ${ph ? `placeholder="${esc(ph)}"` : ""}
+      value="${esc(value)}" ${err ? `aria-invalid="true" aria-describedby="e-${id}"` : hint ? `aria-describedby="h-${id}"` : ""}>
+    ${err ? `<p class="err" id="e-${id}">${esc(t(err))}</p>` : hint ? `<p class="hint" id="h-${id}">${esc(hint)}</p>` : ""}</div>`;
 }
 
 export function cartView() {
   const lines = cartLines();
   if (!lines.length) {
     return {
-      title: `${ t("cartTitle") } · ${ t("brand") } `,
-      html: `< div class="page" > ${ emptyState({ iconName: "cart", title: t("cartEmpty"), sub: t("cartEmptySub"), action: `<a class="btn btn-primary" href="#/shop">${t("browse")}</a>` }) }</div > `,
+      title: `${t("cartTitle")} · ${t("brand")}`,
+      html: `<div class="page">${emptyState({ iconName: "cart", title: t("cartEmpty"), sub: t("cartEmptySub"), action: `<a class="btn btn-primary" href="#/shop">${t("browse")}</a>` })}</div>`,
     };
   }
   const tt = cartTotals();
@@ -432,7 +431,7 @@ export function cartView() {
   lines.forEach((l) => groups.set(l.flower.id, [...(groups.get(l.flower.id) || []), l]));
   const items = [...groups.values()].map((ls) => {
     const f = ls[0].flower;
-    return `< section class="card grp" ><header class="grp-h"><h3>${esc(nameOf(f))}</h3><span class="muted">${esc(specText(f))}</span></header>
+    return `<section class="card grp"><header class="grp-h"><h3>${esc(nameOf(f))}</h3><span class="muted">${esc(specText(f))}</span></header>
       <ul class="lines">${ls.map((l) => {
       const lt = totals([lineOf(l)]);
       const label = `${nameOf(f)} ${nameOf(l.color)}`;
@@ -440,12 +439,12 @@ export function cartView() {
           <button type="button" class="line-img" data-act="zoomc" data-c="${l.color.id}" aria-label="${esc(t("checkPhotos", { name: label }))}">${media(l.color.photos[0], l.color.hex, { alt: label })}</button>
           <div class="line-t"><b class="line-n">${swatch(l.color.hex)}${esc(nameOf(l.color))}</b><small>${esc(unit(lt.stems, "stem"))} · ${esc(unit(lt.bunches, "bunch"))}</small></div>
           <div class="line-a">${stepper(l.color)}<button type="button" class="icon-btn" data-act="del" data-c="${l.color.id}" aria-label="${esc(t("remove"))}: ${esc(label)}">${icon("trash", 18)}</button></div></li>`;
-    }).join("")}</ul></section > `;
+    }).join("")}</ul></section>`;
   }).join("");
   const e = S.errors;
   return {
-    title: `${ t("cartTitle") } · ${ t("brand") } `,
-    html: `< div class="page" > ${ backLink("#/shop", t("addMore")) }
+    title: `${t("cartTitle")} · ${t("brand")}`,
+    html: `<div class="page">${backLink("#/shop", t("addMore"))}
       <div class="page-head"><h1>${t("cartTitle")}</h1></div>
       <div class="cart-grid"><div class="cart-items">${items}</div>
         <aside class="card summary" aria-labelledby="sum-h"><h2 id="sum-h" class="h-sm">${t("summary")}</h2>
@@ -459,31 +458,31 @@ export function cartView() {
             <details class="preview"><summary>${t("preview")}</summary><pre id="msgPreview"></pre></details>
             <button type="submit" class="btn btn-wa btn-lg btn-block" id="sendBtn" ${S.sending ? "disabled" : ""}>${icon("chat", 20)} <span>${S.sending ? t("sending") : t("send")}</span></button>
             <p class="muted center small">${t("noPay")}</p>
-          </form></aside></div ></div > `,
+          </form></aside></div></div>`,
   };
 }
 
-export const previewText = () => `${ buildMessage(cartLines(), "", S.form) } \n\nOrder with photos: \n${ siteUrl() } /order/ ? t = [order_Reference]`;
+export const previewText = () => `${buildMessage(cartLines(), "", S.form)}\n\nOrder with photos:\n${siteUrl()}/order/?t=[order_Reference]`;
 
 /* ---------- Sent ---------- */
 export function sentView() {
   const o = S.orders[0];
   if (!o) return notFoundView();
   return {
-    title: `${ t("sentTitle") } · ${ t("brand") } `,
-    html: `< div class="page narrow" > <div class="done">
-  <span class="done-ic">${icon("check", 34)}</span>
-  <h1>${t("sentTitle")}</h1><p class="muted">${t("sentSub")}</p>
-  <dl class="done-meta"><div><dt>${t("ref")}</dt><dd>${esc(o.token ? refOf(o.token) : "-")}</dd></div>
-    <div><dt>${t("packs")}</dt><dd>${nf(o.packs)}</dd></div></dl>
-  <div class="done-actions">
-    <a class="btn btn-wa btn-lg" href="${esc(S.lastWa || "#")}" target="_blank" rel="noopener">${icon("chat", 20)} ${t("openWa")}</a>
-  ${o.token ? `<a class="btn btn-ghost" href="${esc(orderLink(o.token))}" target="_blank" rel="noopener">${icon("link", 18)} ${t("orderPage")}</a>
+    title: `${t("sentTitle")} · ${t("brand")}`,
+    html: `<div class="page narrow"><div class="done">
+      <span class="done-ic">${icon("check", 34)}</span>
+      <h1>${t("sentTitle")}</h1><p class="muted">${t("sentSub")}</p>
+      <dl class="done-meta"><div><dt>${t("ref")}</dt><dd>${esc(o.token ? refOf(o.token) : "-")}</dd></div>
+        <div><dt>${t("packs")}</dt><dd>${nf(o.packs)}</dd></div></dl>
+      <div class="done-actions">
+        <a class="btn btn-wa btn-lg" href="${esc(S.lastWa || "#")}" target="_blank" rel="noopener">${icon("chat", 20)} ${t("openWa")}</a>
+        ${o.token ? `<a class="btn btn-ghost" href="${esc(orderLink(o.token))}" target="_blank" rel="noopener">${icon("link", 18)} ${t("orderPage")}</a>
         <button class="btn btn-ghost" data-act="copy" data-link="${esc(orderLink(o.token))}">${icon("copy", 18)} ${t("copyLink")}</button>` : ""}
-  <a class="btn btn-primary" href="#/shop">${t("continue")}</a></div></div ></div > `,
+        <a class="btn btn-primary" href="#/shop">${t("continue")}</a></div></div></div>`,
   };
 }
 
 export function errorView() {
-  return `< div class="page" > ${ emptyState({ iconName: "alert", title: t("eLoad"), sub: t("eLoadSub"), action: `<button class="btn btn-primary" data-act="retry">${icon("refresh", 18)} ${t("retry")}</button>` }) }</div > `;
+  return `<div class="page">${emptyState({ iconName: "alert", title: t("eLoad"), sub: t("eLoadSub"), action: `<button class="btn btn-primary" data-act="retry">${icon("refresh", 18)} ${t("retry")}</button>` })}</div>`;
 }
