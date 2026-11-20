@@ -122,6 +122,14 @@ export async function loadCatalog() {
 export const flowersOf = (cat) => S.flowers.filter((f) => f.category_id === cat.id);
 export const hasStock = (f) => f.colors.some((c) => c.in_stock);
 
+/** Sorts flowers so in-stock items appear first while preserving relative sort order. */
+export const byStock = (list) => {
+  const inS = [];
+  const out = [];
+  for (const f of list) (hasStock(f) ? inS : out).push(f);
+  return [...inS, ...out];
+};
+
 /** Color whose photo represents the flower in lists. */
 export function coverColor(f) {
   return f.colors.find((c) => c.in_stock && c.photos.length) || f.colors.find((c) => c.photos.length) || f.colors[0];
@@ -139,12 +147,18 @@ export function categoryCover(cat) {
 /** Photos for the hero slider: the owner's choice, or flower photos as a fallback. */
 export function heroSlides() {
   if (S.hero.length) return S.hero;
-  return S.flowers.map((f) => coverColor(f).photos[0]).filter(Boolean).slice(0, 5);
+  return S.flowers.map((f) => {
+    const c = coverColor(f);
+    const p = c?.photos?.[0];
+    return p ? { ...p, flower: f } : null;
+  }).filter(Boolean).slice(0, 5);
 }
 
 export function searchFlowers(q) {
   const words = normSearch(q).split(/\s+/).filter(Boolean);
-  return words.length ? S.flowers.filter((f) => words.every((w) => f.search.includes(w))) : [];
+  if (!words.length) return [];
+  const matches = S.flowers.filter((f) => words.every((w) => f.search.includes(w)));
+  return byStock(matches);
 }
 
 /* ---------- Cart ---------- */

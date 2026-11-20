@@ -93,22 +93,20 @@ function revealIn(root) {
   $$("[data-reveal]", root).forEach((el) => { el.classList.add("rv"); io.observe(el); });
 }
 
-/* ---------- Hero slider: fade, dots, swipeable (touch & desktop drag), autoplay ---------- */
+/* ---------- Hero slider: stacked card deck, swipeable (touch & desktop drag), autoplay ---------- */
 function initHero(root) {
   const hero = $(".hero", root);
-  const slides = $$(".hero-slide", hero);
-  if (!hero || slides.length < 2) return () => { };
-  const dots = $$(".hero-dot", hero);
+  const deck = $(".hero-deck", hero);
+  const cards = $$(".deck-card", hero);
+  if (!hero || cards.length < 2) return () => { };
   let i = 0, timer = 0, hovering = false, touching = false;
 
   const show = (n) => {
-    slides[i].classList.remove("on");
-    dots[i]?.classList.remove("on");
-    dots[i]?.setAttribute("aria-current", "false");
-    i = (n + slides.length) % slides.length;
-    slides[i].classList.add("on");
-    dots[i]?.classList.add("on");
-    dots[i]?.setAttribute("aria-current", "true");
+    i = (n + cards.length) % cards.length;
+    cards.forEach((card, k) => {
+      const offset = (k - i + cards.length) % cards.length;
+      card.className = "deck-card " + (offset === 0 ? "card-0" : offset === 1 ? "card-1" : offset === 2 ? "card-2" : "card-back");
+    });
   };
 
   const play = () => {
@@ -116,99 +114,197 @@ function initHero(root) {
     if (reduceMotion) return;
     timer = setInterval(() => {
       if (!hovering && !touching && !document.hidden) show(i + 1);
-    }, 6000);
+    }, 5000);
   };
 
   hero.addEventListener("click", (e) => {
-    const b = e.target.closest("[data-hero]");
-    if (!b) return;
-    const d = b.dataset.hero;
-    show(d === "next" ? i + 1 : d === "prev" ? i - 1 : Number(d));
-    play();
+    if (wasDragged) {
+      wasDragged = false;
+      return;
+    }
+    if (animating) return;
+    if (deck && deck.contains(e.target) && !e.target.closest("button, a")) {
+      show(i + 1);
+      play();
+    }
   });
 
   hero.addEventListener("mouseenter", () => (hovering = true));
   hero.addEventListener("mouseleave", () => (hovering = false));
 
-  // Left & right swipe tracking (touch & desktop mouse drag)
+  // Card Toss dismissal physics: left or right swipe throws the front card and reveals the next card
   let startX = 0, startY = 0, lastX = 0, lastY = 0;
-  let active = false;
+  let active = false, animating = false, wasDragged = false;
 
   const onStart = (x, y, target) => {
+    if (animating) return;
     if (target && target.closest("button, a")) return;
+    if (deck && !deck.contains(target)) return;
     startX = lastX = x;
     startY = lastY = y;
     active = true;
     touching = true;
+    wasDragged = false;
+  };
+
+  const resetStyles = () => {
+    cards.forEach((c) => {
+      c.style.transform = "";
+      c.style.opacity = "";
+      c.style.filter = "";
+      c.style.transition = "";
+    });
   };
 
   const onMove = (x, y) => {
-    if (!active) return;
+    if (!active || animating) return;
     lastX = x;
     lastY = y;
+    const dx = lastX - startX;
+    if (Math.abs(dx) > 8) wasDragged = true;
+
+    const frontCard = cards[i];
+    const isRtl = document.documentElement.dir === "rtl";
+    const nextCard = cards[(i + 1) % cards.length];
+    const thirdCard = cards[(i + 2) % cards.length];
+
+    if (frontCard && Math.abs(dx) > 4) {
+      const rot = Math.max(-16, Math.min(16, dx * 0.07));
+      frontCard.style.transform = `translate3d(${dx}px, ${Math.abs(dx) * 0.06}px, 0) rotate(${rot}deg) scale(1)`;
+      frontCard.style.transition = "none";
+
+      if (nextCard && nextCard !== frontCard) {
+        const p = Math.min(1, Math.abs(dx) / 120);
+        const s = 0.94 + 0.06 * p;
+        const op = 0.9 + 0.1 * p;
+        const baseRot = isRtl ? -4 : 4;
+        const r = baseRot * (1 - p);
+        const xOff = (isRtl ? -14 : 14) * (1 - p);
+        const yOff = 4 * (1 - p);
+        const bright = 0.96 + 0.04 * p;
+        nextCard.style.transform = `translate3d(${xOff}px, ${yOff}px, 0) scale(${s}) rotate(${r}deg)`;
+        nextCard.style.opacity = op;
+        nextCard.style.filter = `brightness(${bright})`;
+        nextCard.style.transition = "none";
+      }
+
+      if (thirdCard && thirdCard !== frontCard && thirdCard !== nextCard) {
+        const p = Math.min(1, Math.abs(dx) / 120);
+        const s = 0.88 + 0.06 * p;
+        const op = 0.72 + 0.18 * p;
+        const baseRot2 = isRtl ? 3.5 : -3.5;
+        const targetRot2 = isRtl ? -4 : 4;
+        const r2 = baseRot2 + (targetRot2 - baseRot2) * p;
+        const baseX2 = isRtl ? 12 : -12;
+        const targetX2 = isRtl ? -14 : 14;
+        const xOff2 = baseX2 + (targetX2 - baseX2) * p;
+        const yOff2 = 8 - 4 * p;
+        const bright2 = 0.92 + 0.04 * p;
+        thirdCard.style.transform = `translate3d(${xOff2}px, ${yOff2}px, 0) scale(${s}) rotate(${r2}deg)`;
+        thirdCard.style.opacity = op;
+        thirdCard.style.filter = `brightness(${bright2})`;
+        thirdCard.style.transition = "none";
+      }
+    }
   };
 
   const onEnd = () => {
-    if (!active) return;
+    if (!active || animating) return;
     active = false;
     touching = false;
     const dx = lastX - startX;
     const dy = lastY - startY;
-    if (Math.abs(dx) >= 30 && Math.abs(dx) > Math.abs(dy)) {
-      show(dx > 0 ? i + 1 : i - 1);
-      play();
+    const frontCard = cards[i];
+    const isSwipe = Math.abs(dx) >= 36 && Math.abs(dx) > Math.abs(dy);
+
+    if (isSwipe && frontCard) {
+      animating = true;
+      const isRtl = document.documentElement.dir === "rtl";
+      const flyDir = Math.sign(dx) || (isRtl ? -1 : 1);
+      frontCard.style.transition = "transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.24s ease";
+      frontCard.style.transform = `translate3d(${flyDir * 125}%, 20px, 0) rotate(${flyDir * 18}deg)`;
+      frontCard.style.opacity = "0";
+
+      const nextCard = cards[(i + 1) % cards.length];
+      if (nextCard && nextCard !== frontCard) {
+        nextCard.style.transition = "transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.28s ease, filter 0.28s ease";
+        nextCard.style.transform = "translate3d(0, 0, 0) scale(1) rotate(0deg)";
+        nextCard.style.opacity = "1";
+        nextCard.style.filter = "brightness(1)";
+      }
+
+      const thirdCard = cards[(i + 2) % cards.length];
+      if (thirdCard && thirdCard !== frontCard && thirdCard !== nextCard) {
+        thirdCard.style.transition = "transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.28s ease, filter 0.28s ease";
+        thirdCard.style.transform = isRtl ? "translate3d(-14px, 4px, 0) scale(0.94) rotate(-4deg)" : "translate3d(14px, 4px, 0) scale(0.94) rotate(4deg)";
+        thirdCard.style.opacity = "0.9";
+        thirdCard.style.filter = "brightness(0.96)";
+      }
+
+      setTimeout(() => {
+        resetStyles();
+        show(i + 1);
+        animating = false;
+        play();
+      }, 260);
+    } else {
+      cards.forEach((c) => {
+        c.style.transition = "transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, filter 0.3s ease";
+        c.style.transform = "";
+        c.style.opacity = "";
+        c.style.filter = "";
+      });
+      setTimeout(resetStyles, 320);
     }
   };
 
   const onCancel = () => {
     active = false;
     touching = false;
+    resetStyles();
   };
 
-  // Prevent default image drag
-  hero.addEventListener("dragstart", (e) => e.preventDefault());
+  if (deck) {
+    deck.addEventListener("dragstart", (e) => e.preventDefault());
+    deck.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      onStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
+    }, { passive: true });
+    deck.addEventListener("touchmove", (e) => {
+      if (e.touches.length !== 1) return;
+      onMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    deck.addEventListener("touchend", onEnd, { passive: true });
+    deck.addEventListener("touchcancel", onCancel, { passive: true });
 
-  // Touch devices: passive touch listeners
-  hero.addEventListener("touchstart", (e) => {
-    if (e.touches.length !== 1) return;
-    const t = e.touches[0];
-    onStart(t.clientX, t.clientY, e.target);
-  }, { passive: true });
+    const onMouseDown = (e) => {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      if (e.button !== 0) return;
+      onStart(e.clientX, e.clientY, e.target);
+    };
+    const onMouseMove = (e) => {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      onMove(e.clientX, e.clientY);
+    };
+    const onMouseUp = (e) => {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      onEnd();
+    };
 
-  hero.addEventListener("touchmove", (e) => {
-    if (e.touches.length !== 1) return;
-    const t = e.touches[0];
-    onMove(t.clientX, t.clientY);
-  }, { passive: true });
+    deck.addEventListener("pointerdown", onMouseDown);
+    window.addEventListener("pointermove", onMouseMove);
+    window.addEventListener("pointerup", onMouseUp);
 
-  hero.addEventListener("touchend", onEnd, { passive: true });
-  hero.addEventListener("touchcancel", onCancel, { passive: true });
-
-  // Desktop mouse dragging (only when e.pointerType === "mouse")
-  const onMouseDown = (e) => {
-    if (e.pointerType && e.pointerType !== "mouse") return;
-    if (e.button !== 0) return;
-    onStart(e.clientX, e.clientY, e.target);
-  };
-  const onMouseMove = (e) => {
-    if (e.pointerType && e.pointerType !== "mouse") return;
-    onMove(e.clientX, e.clientY);
-  };
-  const onMouseUp = (e) => {
-    if (e.pointerType && e.pointerType !== "mouse") return;
-    onEnd();
-  };
-
-  hero.addEventListener("pointerdown", onMouseDown);
-  window.addEventListener("pointermove", onMouseMove);
-  window.addEventListener("pointerup", onMouseUp);
+    play();
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("pointermove", onMouseMove);
+      window.removeEventListener("pointerup", onMouseUp);
+    };
+  }
 
   play();
-  return () => {
-    clearInterval(timer);
-    window.removeEventListener("pointermove", onMouseMove);
-    window.removeEventListener("pointerup", onMouseUp);
-  };
+  return () => clearInterval(timer);
 }
 
 /* ---------- Swipeable carousel with dots (recent orders on phones) ---------- */
@@ -469,6 +565,13 @@ function translateStatic() {
   if (footWa) footWa.innerHTML = `${icon("chat", 16)} <span>${t("footWa")}</span>`;
   const footIg = $("#footIg");
   if (footIg) footIg.innerHTML = `${icon("instagram", 16)} <span>${t("footIg")}</span>`;
+  const devWa = $("#devWa");
+  if (devWa) {
+    const devMsg = S.lang === "ar"
+      ? "مرحباً م. عبد الله، رأيت موقع YehiaFlowers وأود التحدث معك حول مشروع موقع."
+      : "Hello ENG. Abdallah, I saw YehiaFlowers and would like to discuss a website project.";
+    devWa.href = `https://wa.me/201018114974?text=${encodeURIComponent(devMsg)}`;
+  }
   const backTopIc = $("#backTopIc");
   if (backTopIc) backTopIc.innerHTML = icon("arrowUp", 20);
 }
